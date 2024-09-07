@@ -1,8 +1,25 @@
+require:
+  - rubocop-rake
+  - rubocop-rspec
+
 AllCops:
-  TargetRubyVersion: 3.0
+  NewCops: enable
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
 
 Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
+
+Style/Documentation:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Max: 15
+
+Naming/MethodParameterName:
+  Enabled: false
+
+Naming/FileName:
+  Exclude:
+    - "lib/rbs-trace.rb"

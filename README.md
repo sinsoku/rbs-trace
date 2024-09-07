@@ -1,24 +1,97 @@
-# Rbs::Trace
+# RBS::Trace
 
-TODO: Delete this and the text below, and describe your gem
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/rbs/trace`. To experiment with that code, run `bin/console` for an interactive prompt.
+RBS::Trace collects argument types and return value types using TracePoint, and inserts inline RBS type declarations into files.
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
-
 Install the gem and add to the application's Gemfile by executing:
 
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+    $ bundle add rbs-trace
 
 If bundler is not being used to manage dependencies, install the gem by executing:
 
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+    $ gem install rbs-trace
 
 ## Usage
 
-TODO: Write usage instructions here
+For example, suppose you have the following class:
+
+```ruby
+class User
+  def initialize(first_name, last_name)
+    @first_name = first_name
+    @last_name = last_name
+  end
+
+  def full_name
+    "#{@first_name} #{@last_name}"
+  end
+
+  def say_hello
+    puts "hi, #{full_name}."
+  end
+end
+```
+
+Call target methods within the `enable` method block, and call the `insert_rbs` method.
+
+```ruby
+tracing = RBS::Trace::MethodTracing.new
+
+# Collects the types of methods called in the block.
+tracing.enable do
+  user = User.new("Nanoha", "Takamachi")
+  user.say_hello
+end
+
+tracing.insert_rbs
+```
+
+Automatically inserts inline RBS definitions into the file.
+
+```ruby
+class User
+  # @rbs (String, String) -> void
+  def initialize(first_name, last_name)
+    @first_name = first_name
+    @last_name = last_name
+  end
+
+  # @rbs () -> String
+  def full_name
+    "#{@first_name} #{@last_name}"
+  end
+
+  # @rbs () -> void
+  def say_hello
+    puts "hi, #{full_name}."
+  end
+end
+```
+
+### RSpec
+
+Add the following code to `spec/support/rbs_trace.rb`.
+
+```ruby
+return unless ENV["RBS_TRACE"]
+
+RSpec.configure do |config|
+  tracing = RBS::Trace::MethodTracing.new
+
+  config.before(:suite) { tracing.enable }
+  config.after(:suite) do
+    tracing.disable
+    tracing.insert_rbs
+  end
+end
+```
+
+Then run RSpec with the environment variables.
+
+```console
+$ RBS_TRACE=1 bundle exec rspec
+```
 
 ## Development
 
