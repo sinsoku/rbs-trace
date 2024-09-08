@@ -6,6 +6,7 @@ module RBS
       METHOD_KINDS = %i[req opt rest keyreq key keyrest].freeze
       private_constant :METHOD_KINDS
 
+      attr_reader :parameters, :void
       attr_accessor :return_type
 
       def initialize(parameters, void: false)
@@ -14,17 +15,24 @@ module RBS
       end
 
       def to_rbs
-        ret = if @void
-                "void"
-              elsif @return_type == NilClass
-                "nil"
-              elsif @return_type == TrueClass || @return_type == FalseClass
-                "bool"
-              else
-                @return_type
-              end
+        return_rbs = void ? "void" : convert_type(return_type)
 
-        "(#{parameters_rbs}) -> #{ret}"
+        "(#{parameters_rbs}) -> #{return_rbs}"
+      end
+
+      def merge(other) # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
+        new_parameters = @parameters.map.with_index do |parameter, index|
+          kind = parameter[0]
+          name = parameter[1]
+          klass = parameter[2]
+          other_klass = other.parameters[index][2]
+
+          merged_klass = (klass + other_klass).uniq
+          [kind, name, merged_klass]
+        end
+        Declaration.new(new_parameters, void: void && other.void).tap do |decl|
+          decl.return_type = (return_type + other.return_type).uniq
+        end
       end
 
       private
@@ -45,20 +53,33 @@ module RBS
       end
 
       def convert(kind, name, klass) # rubocop:disable Metrics/MethodLength
+        type = convert_type(klass)
         case kind
         when :req
-          klass
+          type
         when :opt
-          "?#{klass}"
+          "?#{type}"
         when :rest
-          "*#{klass.join("|")}"
+          "*#{type}"
         when :keyreq
-          "#{name}: #{klass}"
+          "#{name}: #{type}"
         when :key
-          "?#{name}: #{klass}"
+          "?#{name}: #{type}"
         when :keyrest
-          "**#{klass.join("|")}"
+          "**#{type}"
         end
+      end
+
+      def convert_type(klass)
+        klass.map do |k|
+          if k == NilClass
+            "nil"
+          elsif [TrueClass, FalseClass].include?(k)
+            "bool"
+          else
+            k.name
+          end
+        end.uniq.join("|")
       end
     end
   end

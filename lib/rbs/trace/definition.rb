@@ -20,8 +20,7 @@ module RBS
       end
 
       def rbs
-        # TODO: merge multiple decls
-        @decls.first.to_rbs
+        @decls.inject { |result, decl| result.merge(decl) }.to_rbs
       end
     end
   end

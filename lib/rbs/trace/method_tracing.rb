@@ -83,7 +83,7 @@ module RBS
                   when :block
                     # TODO: support block argument
                   else
-                    value.class
+                    [value.class]
                   end
           [kind, name, klass]
         end
@@ -95,7 +95,7 @@ module RBS
         # TODO: check usecase where decl is nil
         return unless decl
 
-        decl.return_type = tp.event == :return ? tp.return_value.class : nil
+        decl.return_type = tp.event == :return ? [tp.return_value.class] : [nil]
         definition.decls << decl
       end
 
