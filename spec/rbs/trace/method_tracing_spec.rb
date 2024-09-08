@@ -159,4 +159,21 @@ RSpec.describe RBS::Trace::MethodTracing do
     definition = file.definitions["#{mod}::A#m"]
     expect(definition.rbs).to eq("(bool) -> Integer|String")
   end
+
+  it "supports Optional type arguments" do
+    source = <<~RUBY
+      class A
+        def m(x)
+        end
+      end
+    RUBY
+    file = trace_source(source, mod) do
+      obj = mod::A.new
+      obj.m(1)
+      obj.m(nil)
+    end
+
+    definition = file.definitions["#{mod}::A#m"]
+    expect(definition.rbs).to eq("(Integer?) -> void")
+  end
 end

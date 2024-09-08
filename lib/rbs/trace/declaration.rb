@@ -70,16 +70,26 @@ module RBS
         end
       end
 
-      def convert_type(klass)
-        klass.map do |k|
+      def convert_type(klass) # rubocop:disable Metrics/CyclomaticComplexity,Metrics/MethodLength,Metrics/PerceivedComplexity
+        optional = klass.any? { |k| k == NilClass }
+        types = klass.filter_map do |k|
           if k == NilClass
-            "nil"
+            nil
           elsif [TrueClass, FalseClass].include?(k)
             "bool"
           else
             k.name
           end
-        end.uniq.join("|")
+        end.uniq
+        type = types.join("|")
+
+        if types.size > 1 && optional
+          "(#{type})?"
+        elsif optional
+          "#{type}?"
+        else
+          type
+        end
       end
     end
   end
