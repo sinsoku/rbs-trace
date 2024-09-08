@@ -124,4 +124,39 @@ RSpec.describe RBS::Trace::MethodTracing do
     definition = file.definitions["#{mod}::A.m"]
     expect(definition.rbs).to eq("() -> void")
   end
+
+  it "supports Union type arguments" do
+    source = <<~RUBY
+      class A
+        def m(x)
+        end
+      end
+    RUBY
+    file = trace_source(source, mod) do
+      obj = mod::A.new
+      obj.m(1)
+      obj.m("a")
+    end
+
+    definition = file.definitions["#{mod}::A#m"]
+    expect(definition.rbs).to eq("(Integer|String) -> void")
+  end
+
+  it "supports Union type return value" do
+    source = <<~RUBY
+      class A
+        def m(is_int)
+          is_int ? 1 : "a"
+        end
+      end
+    RUBY
+    file = trace_source(source, mod) do
+      obj = mod::A.new
+      result_int = obj.m(true) # rubocop:disable Lint/UselessAssignment
+      result_str = obj.m(false) # rubocop:disable Lint/UselessAssignment
+    end
+
+    definition = file.definitions["#{mod}::A#m"]
+    expect(definition.rbs).to eq("(bool) -> Integer|String")
+  end
 end
