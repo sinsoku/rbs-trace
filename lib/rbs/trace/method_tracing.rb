@@ -72,16 +72,17 @@ module RBS
         logger.debug(e)
       end
 
-      def call_event(tp) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
-        parameters = tp.parameters.map do |kind, name|
-          value = tp.binding.local_variable_get(name)
+      def call_event(tp) # rubocop:disable Metrics
+        parameters = tp.parameters.filter_map do |kind, name|
+          value = tp.binding.local_variable_get(name) unless %i[* ** &].include?(name)
           klass = case kind
                   when :rest
-                    value.map(&:class).uniq
+                    value ? value.map(&:class).uniq : [Object]
                   when :keyrest
-                    value.map { |_, v| v.class }.uniq
+                    value ? value.map { |_, v| v.class }.uniq : [Object]
                   when :block
                     # TODO: support block argument
+                    next
                   else
                     [value.class]
                   end
@@ -104,17 +105,20 @@ module RBS
         ruby_lib_path = RbConfig::CONFIG["rubylibdir"]
 
         path.start_with?("<internal") ||
+          path.start_with?("(eval") ||
           path.start_with?(bundle_path) ||
           path.start_with?(ruby_lib_path) ||
           path.start_with?(__FILE__)
       end
 
-      def assign_return_value?(path, method_id) # rubocop:disable Metrics/AbcSize
+      def assign_return_value?(path, method_id) # rubocop:disable Metrics
         is_initialize = method_id == :initialize
         return false if is_initialize
 
         i = caller_locations.index { |loc| loc.path == path && loc.label == method_id.to_s }
-        loc = caller_locations[i + 1]
+        loc = caller_locations[i + 1] if i
+        # If the caller is not found, assume the return value is used.
+        return true unless loc
 
         node = parsed_nodes(loc.path)
         method_name = is_initialize ? :new : method_id
