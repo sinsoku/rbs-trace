@@ -77,6 +77,8 @@ module RBS
             nil
           elsif [TrueClass, FalseClass].include?(k)
             "bool"
+          elsif k == Object
+            "untyped"
           else
             k.name
           end

@@ -193,4 +193,17 @@ RSpec.describe RBS::Trace::MethodTracing do
     tracing.enable { mod::A.new.m }
     expect(tracing.files).to be_empty
   end
+
+  it "supports anonymous arguments" do
+    source = <<~RUBY
+      class A
+        def m(*, **, &)
+        end
+      end
+    RUBY
+    file = trace_source(source, mod) { mod::A.new.m }
+
+    definition = file.definitions["#{mod}::A#m"]
+    expect(definition.rbs).to eq("(*untyped, **untyped) -> void")
+  end
 end
