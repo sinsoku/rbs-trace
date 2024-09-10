@@ -115,7 +115,9 @@ module RBS
         return false if is_initialize
 
         i = caller_locations.index { |loc| loc.path == path && loc.label == method_id.to_s }
-        loc = caller_locations[i + 1]
+        loc = caller_locations[i + 1] if i
+        # If the caller is not found, assume the return value is used.
+        return true unless loc
 
         node = parsed_nodes(loc.path)
         method_name = is_initialize ? :new : method_id
