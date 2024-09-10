@@ -104,12 +104,13 @@ module RBS
         ruby_lib_path = RbConfig::CONFIG["rubylibdir"]
 
         path.start_with?("<internal") ||
+          path.start_with?("(eval") ||
           path.start_with?(bundle_path) ||
           path.start_with?(ruby_lib_path) ||
           path.start_with?(__FILE__)
       end
 
-      def assign_return_value?(path, method_id) # rubocop:disable Metrics/AbcSize
+      def assign_return_value?(path, method_id) # rubocop:disable Metrics
         is_initialize = method_id == :initialize
         return false if is_initialize
 
