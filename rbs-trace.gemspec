@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.summary = "Automatically Insert inline RBS type declarations using runtime information."
   spec.description = <<~DESCRIPTION
     RBS::Trace collects argument types and return value types using TracePoint, and inserts
-    inline RBS type declarations into files."
+    inline RBS type declarations into files.
   DESCRIPTION
   spec.homepage = "https://github.com/sinsoku/rbs-trace"
   spec.license = "MIT"
