@@ -11,3 +11,5 @@
 .rspec_status
 
 .ruby-version
+
+/.gem_rbs_collection

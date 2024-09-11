@@ -10,20 +10,34 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Ruby ${{ matrix.ruby }}
+    name: Ruby ${{ matrix.ruby.version }}
     strategy:
       matrix:
         ruby:
-          - '3.1'
-          - '3.2'
-          - '3.3'
+          - version: '3.1'
+            gemfile: gemfiles/3.1.gemfile
+          - version: '3.2'
+            gemfile: gemfiles/3.1.gemfile
+          - version: '3.3'
+            gemfile: Gemfile
+    env:
+      BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.ruby.gemfile }}
 
     steps:
     - uses: actions/checkout@v4
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: ${{ matrix.ruby }}
+        ruby-version: ${{ matrix.ruby.version }}
         bundler-cache: true
+
+    - name: Install RBS files
+      if: ${{ matrix.ruby.version == '3.3' }}
+      run: bundle exec rbs collection install --frozen
+
     - name: Run the default task
       run: bundle exec rake
+
+    - name: Check RBS files are committed
+      if: ${{ matrix.ruby.version == '3.3' }}
+      run: git diff --exit-code sig

@@ -1,0 +1,36 @@
+# Generated from lib/rbs/trace/declaration.rb with RBS::Inline
+
+module RBS
+  module Trace
+    class Declaration
+      METHOD_KINDS: Array[Symbol]
+
+      attr_reader parameters: Array[untyped]
+
+      attr_reader void: bool
+
+      attr_accessor return_type: Array[Object]
+
+      # @rbs (Array[untyped], ?void: bool) -> void
+      def initialize: (Array[untyped], ?void: bool) -> void
+
+      # @rbs () -> String
+      def to_rbs: () -> String
+
+      # @rbs (Declaration) -> Declaration
+      def merge: (Declaration) -> Declaration
+
+      private
+
+      # TODO: support block argument
+      # @rbs () -> String
+      def parameters_rbs: () -> String
+
+      # @rbs (Symbol, Symbol, Array[Object]) -> String?
+      def convert: (Symbol, Symbol, Array[Object]) -> String?
+
+      # @rbs (Array[Object]) -> String
+      def convert_type: (Array[Object]) -> String
+    end
+  end
+end
