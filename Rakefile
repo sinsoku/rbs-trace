@@ -9,4 +9,19 @@ require "rubocop/rake_task"
 
 RuboCop::RakeTask.new
 
-task default: %i[spec rubocop]
+desc "Generate rbs files"
+task :rbs_inline do
+  sh "rbs-inline --output --opt-out lib"
+end
+
+desc "Run Steep"
+task :steep do
+  sh "steep check"
+end
+
+default = if RUBY_VERSION.start_with?("3.3")
+            %i[spec rubocop rbs_inline steep]
+          else
+            %i[spec rubocop]
+          end
+task(default:)

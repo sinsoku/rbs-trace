@@ -24,3 +24,9 @@ Naming/MethodParameterName:
 Naming/FileName:
   Exclude:
     - "lib/rbs-trace.rb"
+
+Layout/LeadingCommentSpace:
+  Enabled: false
+
+Style/AccessorGrouping:
+  Enabled: false

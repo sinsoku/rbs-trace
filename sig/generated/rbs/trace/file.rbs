@@ -1,0 +1,27 @@
+# Generated from lib/rbs/trace/file.rb with RBS::Inline
+
+module RBS
+  module Trace
+    class File
+      # @rbs (String) -> void
+      def initialize: (String) -> void
+
+      # @rbs () -> Hash[String, Definition]
+      def definitions: () -> Hash[String, Definition]
+
+      # @rbs () -> String
+      def with_rbs: () -> String
+
+      # @rbs () -> void
+      def rewrite: () -> void
+
+      private
+
+      # @rbs (Array[String], Definition) -> boolish
+      def skip_insert?: (Array[String], Definition) -> boolish
+
+      # @rbs () -> Enumerator[Definition, void]
+      def reverse_definitions: () -> Enumerator[Definition, void]
+    end
+  end
+end

@@ -3,23 +3,27 @@
 module RBS
   module Trace
     class Declaration
-      METHOD_KINDS = %i[req opt rest keyreq key keyrest].freeze
+      METHOD_KINDS = %i[req opt rest keyreq key keyrest].freeze #: Array[Symbol]
       private_constant :METHOD_KINDS
 
-      attr_reader :parameters, :void
-      attr_accessor :return_type
+      attr_reader :parameters #: Array[untyped]
+      attr_reader :void #: bool
+      attr_accessor :return_type #: Array[Object]
 
+      # @rbs (Array[untyped], ?void: bool) -> void
       def initialize(parameters, void: false)
         @parameters = parameters
         @void = void
       end
 
+      # @rbs () -> String
       def to_rbs
         return_rbs = void ? "void" : convert_type(return_type)
 
         "(#{parameters_rbs}) -> #{return_rbs}"
       end
 
+      # @rbs (Declaration) -> Declaration
       def merge(other) # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
         new_parameters = @parameters.map.with_index do |parameter, index|
           kind = parameter[0]
@@ -38,6 +42,7 @@ module RBS
       private
 
       # TODO: support block argument
+      # @rbs () -> String
       def parameters_rbs
         converted = {}
         @parameters.each do |kind, name, klass|
@@ -48,10 +53,7 @@ module RBS
         METHOD_KINDS.flat_map { |kind| converted[kind] }.compact.join(", ")
       end
 
-      def select_parameters(selected)
-        @parameters.select { |kind, _name, _klass| kind == selected }
-      end
-
+      # @rbs (Symbol, Symbol, Array[Object]) -> String?
       def convert(kind, name, klass) # rubocop:disable Metrics/MethodLength
         type = convert_type(klass)
         case kind
@@ -70,17 +72,18 @@ module RBS
         end
       end
 
+      # @rbs (Array[Object]) -> String
       def convert_type(klass) # rubocop:disable Metrics
         optional = klass.any? { |k| k == NilClass }
         types = klass.filter_map do |k|
           if k == NilClass
             nil
-          elsif [TrueClass, FalseClass].include?(k)
+          elsif [TrueClass, FalseClass].include?(k) # steep:ignore ArgumentTypeMismatch
             "bool"
           elsif k == Object
             "untyped"
           else
-            k.name
+            k.name # steep:ignore NoMethod
           end
         end.uniq
         type = types.join("|")

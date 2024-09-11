@@ -1,0 +1,60 @@
+# Generated from lib/rbs/trace/method_tracing.rb with RBS::Inline
+
+module RBS
+  module Trace
+    class MethodTracing
+      # rubocop:disable Metrics/ClassLength
+      ASSIGNED_NODE_TYPES: Array[Symbol]
+
+      # @rbs [T] () { () -> T } -> T
+      def enable: [T] () { () -> T } -> T
+
+      # @rbs () -> void
+      def disable: () -> void
+
+      # @rbs () -> Hash[String, File]
+      def files: () -> Hash[String, File]
+
+      # @rbs () -> void
+      def insert_rbs: () -> void
+
+      private
+
+      # @rbs () -> TracePoint
+      def trace: () -> TracePoint
+
+      # @rbs () -> Logger
+      def logger: () -> Logger
+
+      # @rbs () -> Array[Declaration]
+      def stack_traces: () -> Array[Declaration]
+
+      # @rbs (String) -> File
+      def find_or_new_file: (String) -> File
+
+      # @rbs (File, TracePoint) -> Definition
+      def find_or_new_definition: (File, TracePoint) -> Definition
+
+      # @rbs (TracePoint) -> void
+      def record: (TracePoint) -> void
+
+      # @rbs (TracePoint) -> void
+      def call_event: (TracePoint) -> void
+
+      # @rbs (TracePoint, Definition) -> void
+      def return_event: (TracePoint, Definition) -> void
+
+      # @rbs (String) -> bool
+      def ignore_path?: (String) -> bool
+
+      # @rbs (String, Symbol) -> bool
+      def assign_return_value?: (String, Symbol) -> bool
+
+      # @rbs (Prism::Node, method_name: Symbol, lineno: Integer, ?parents: Array[Prism::Node]) -> Array[Prism::Node]?
+      def find_parents: (Prism::Node, method_name: Symbol, lineno: Integer, ?parents: Array[Prism::Node]) -> Array[Prism::Node]?
+
+      # @rbs (String) -> Prism::ProgramNode
+      def parsed_nodes: (String) -> Prism::ProgramNode
+    end
+  end
+end

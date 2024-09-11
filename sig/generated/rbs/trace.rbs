@@ -1,0 +1,8 @@
+# Generated from lib/rbs/trace.rb with RBS::Inline
+
+module RBS
+  module Trace
+    class Error < StandardError
+    end
+  end
+end
