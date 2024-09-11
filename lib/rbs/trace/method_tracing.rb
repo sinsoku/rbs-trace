@@ -74,7 +74,7 @@ module RBS
 
       def call_event(tp) # rubocop:disable Metrics
         parameters = tp.parameters.filter_map do |kind, name|
-          value = tp.binding.local_variable_get(name) unless %i[* ** &].include?(name)
+          value = tp.binding.local_variable_get(name) if name && !%i[* ** &].include?(name)
           klass = case kind
                   when :rest
                     value ? value.map(&:class).uniq : [Object]
