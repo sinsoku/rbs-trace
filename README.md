@@ -69,6 +69,8 @@ class User
 end
 ```
 
+## Integration
+
 ### RSpec
 
 Add the following code to `spec/support/rbs_trace.rb`.
@@ -92,6 +94,20 @@ Then run RSpec with the environment variables.
 ```console
 $ RBS_TRACE=1 bundle exec rspec
 ```
+
+## Tips
+
+### Insert RBS declarations for specific files only
+
+```ruby
+tracing.files.each do |path, file|
+  file.rewrite if path.include?("app/models/")
+end
+```
+
+### Enable debug logging
+
+If you want to enable debug logging, specify the environment variable `RBS_TRACE_DEBUG`.
 
 ## Development
 
