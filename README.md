@@ -95,6 +95,20 @@ Then run RSpec with the environment variables.
 $ RBS_TRACE=1 bundle exec rspec
 ```
 
+### Minitest
+
+Add the following code to `test_helper.rb`.
+
+```ruby
+tracing = RBS::Trace::MethodTracing.new
+tracing.enable
+
+Minitest.after_run do
+  tracing.disable
+  tracing.insert_rbs
+end
+```
+
 ## Tips
 
 ### Insert RBS declarations for specific files only
