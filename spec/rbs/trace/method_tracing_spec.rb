@@ -219,4 +219,17 @@ RSpec.describe RBS::Trace::MethodTracing do
     definition = file.definitions["#{mod}::A#m"]
     expect(definition.rbs).to eq("(*untyped, **untyped) -> void")
   end
+
+  it "supports generics with Array and Hash" do
+    source = <<~RUBY
+      class A
+        def m(x, y)
+        end
+      end
+    RUBY
+    file = trace_source(source, mod) { mod::A.new.m([], {}) }
+
+    definition = file.definitions["#{mod}::A#m"]
+    expect(definition.rbs).to eq("(Array[untyped], Hash[untyped]) -> void")
+  end
 end
