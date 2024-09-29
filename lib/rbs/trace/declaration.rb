@@ -80,6 +80,8 @@ module RBS
             nil
           elsif [TrueClass, FalseClass].include?(k) # steep:ignore ArgumentTypeMismatch
             "bool"
+          elsif [Array, Hash].include?(k) # steep:ignore ArgumentTypeMismatch
+            "#{k}[untyped]"
           elsif k == Object
             "untyped"
           else
