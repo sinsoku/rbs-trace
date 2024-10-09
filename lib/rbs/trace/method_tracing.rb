@@ -142,10 +142,9 @@ module RBS
         # If the caller is not found, assume the return value is used.
         return true unless loc
 
-        # Ignore eval because it is difficult to parse
-        return false if loc.path&.start_with?("(eval")
-
         node = parsed_nodes(loc.path) # steep:ignore ArgumentTypeMismatch
+        return false unless node
+
         method_name = is_initialize ? :new : method_id
         parents = find_parents(node, method_name:, lineno: loc.lineno)
         return false unless parents
@@ -166,8 +165,10 @@ module RBS
         result
       end
 
-      # @rbs (String) -> Prism::ProgramNode
+      # @rbs (String) -> Prism::ProgramNode?
       def parsed_nodes(path)
+        return unless ::File.exist?(path)
+
         @parsed_nodes ||= {}
         @parsed_nodes[path] ||= Prism.parse_file(path)
         @parsed_nodes[path].value

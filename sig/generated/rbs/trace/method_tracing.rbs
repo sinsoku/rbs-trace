@@ -56,8 +56,8 @@ module RBS
       # @rbs (Prism::Node, method_name: Symbol, lineno: Integer, ?parents: Array[Prism::Node]) -> Array[Prism::Node]?
       def find_parents: (Prism::Node, method_name: Symbol, lineno: Integer, ?parents: Array[Prism::Node]) -> Array[Prism::Node]?
 
-      # @rbs (String) -> Prism::ProgramNode
-      def parsed_nodes: (String) -> Prism::ProgramNode
+      # @rbs (String) -> Prism::ProgramNode?
+      def parsed_nodes: (String) -> Prism::ProgramNode?
     end
   end
 end
