@@ -248,4 +248,19 @@ RSpec.describe RBS::Trace::MethodTracing do
     definition = file.definitions["#{mod}::A#m"]
     expect(definition.rbs).to eq("(#{mod}::A) -> #{mod}::A")
   end
+
+  it "supports eval, but the retrun value is always void" do
+    source = <<~RUBY
+      class A
+        def m
+        end
+      end
+    RUBY
+    file = trace_source(source, mod) do
+      obj = eval("mod::A.new.m") # rubocop:disable Lint/UselessAssignment, Style/EvalWithLocation
+    end
+
+    definition = file.definitions["#{mod}::A#m"]
+    expect(definition.rbs).to eq("() -> void")
+  end
 end

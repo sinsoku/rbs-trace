@@ -142,6 +142,9 @@ module RBS
         # If the caller is not found, assume the return value is used.
         return true unless loc
 
+        # Ignore eval because it is difficult to parse
+        return false if loc.path&.start_with?("(eval")
+
         node = parsed_nodes(loc.path) # steep:ignore ArgumentTypeMismatch
         method_name = is_initialize ? :new : method_id
         parents = find_parents(node, method_name:, lineno: loc.lineno)
