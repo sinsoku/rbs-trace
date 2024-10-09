@@ -62,8 +62,7 @@ module RBS
         mark = is_singleton ? "." : "#"
         signature = "#{klass}#{mark}#{name}"
 
-        _filename, lineno = tp.self.method(name).source_location
-        file.definitions[signature] ||= Definition.new(klass:, name:, lineno:)
+        file.definitions[signature] ||= Definition.new(klass:, name:, lineno: tp.lineno)
       end
 
       # @rbs (TracePoint) -> void
@@ -91,14 +90,14 @@ module RBS
           # steep:ignore:end
           klass = case kind
                   when :rest
-                    value ? value.map(&:class).uniq : [Object]
+                    value ? value.map { |v| obj_to_class(v) }.uniq : [Object]
                   when :keyrest
-                    value ? value.map { |_, v| v.class }.uniq : [Object]
+                    value ? value.map { |_, v| obj_to_class(v) }.uniq : [Object]
                   when :block
                     # TODO: support block argument
                     next
                   else
-                    [value.class]
+                    [obj_to_class(value)]
                   end
           [kind, name, klass]
         end
@@ -111,8 +110,13 @@ module RBS
         # TODO: check usecase where decl is nil
         return unless decl
 
-        decl.return_type = tp.event == :return ? [tp.return_value.class] : [NilClass]
+        decl.return_type = tp.event == :return ? [obj_to_class(tp.return_value)] : [NilClass]
         definition.decls << decl
+      end
+
+      # @rbs (BasicObject) -> Class
+      def obj_to_class(obj)
+        Object.instance_method(:class).bind_call(obj)
       end
 
       # @rbs (String) -> bool

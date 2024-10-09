@@ -44,6 +44,9 @@ module RBS
       # @rbs (TracePoint, Definition) -> void
       def return_event: (TracePoint, Definition) -> void
 
+      # @rbs (BasicObject) -> Class
+      def obj_to_class: (BasicObject) -> Class
+
       # @rbs (String) -> bool
       def ignore_path?: (String) -> bool
 

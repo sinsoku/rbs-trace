@@ -232,4 +232,20 @@ RSpec.describe RBS::Trace::MethodTracing do
     definition = file.definitions["#{mod}::A#m"]
     expect(definition.rbs).to eq("(Array[untyped], Hash[untyped]) -> void")
   end
+
+  it "supports subclasses of BasicObject" do
+    source = <<~RUBY
+      class A < BasicObject
+        def m(x)
+          A.new
+        end
+      end
+    RUBY
+    file = trace_source(source, mod) do
+      obj = mod::A.new.m(mod::A.new) # rubocop:disable Lint/UselessAssignment
+    end
+
+    definition = file.definitions["#{mod}::A#m"]
+    expect(definition.rbs).to eq("(#{mod}::A) -> #{mod}::A")
+  end
 end
