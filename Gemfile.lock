@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rbs-trace (0.2.0)
+    rbs-trace (0.3.0)
       prism (>= 0.3.0)
 
 GEM

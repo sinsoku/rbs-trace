@@ -1,5 +1,14 @@
 ## [Unreleased]
 
+## [0.3.0] - 2024-10-10
+
+- feat: Support eval
+- feat: Support subclasses of BasicObject
+- feat: Support generics with Array and Hash
+- docs: Add steps to integrate with Minitest
+- docs: Fix RubyGems metadata
+- ci: Add Ruby 3.1 to matrix
+
 ## [0.2.0] - 2024-09-11
 
 - feat: Support Union type
