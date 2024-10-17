@@ -112,6 +112,28 @@ RSpec.describe RBS::Trace::MethodTracing do
     expect(definition.rbs).to eq("() -> void")
   end
 
+  it "supports methods that call methods that raise exceptions" do # rubocop:disable RSpec/ExampleLength
+    source = <<~RUBY
+      class A
+        def m(x)
+          foo
+        end
+
+        def foo
+          raise "error"
+        end
+      end
+    RUBY
+    file = trace_source(source, mod) do
+      mod::A.new.m(1)
+    rescue StandardError
+      nil
+    end
+
+    def_m = file.definitions["#{mod}::A#m"]
+    expect(def_m.rbs).to eq("(Integer) -> void")
+  end
+
   it "supports singleton methods" do
     source = <<~RUBY
       class A
