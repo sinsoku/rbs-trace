@@ -32,7 +32,7 @@ module RBS
 
       # @rbs () -> TracePoint
       def trace
-        @trace ||= TracePoint.new(:call, :return, :raise) { |tp| record(tp) }
+        @trace ||= TracePoint.new(:call, :return) { |tp| record(tp) }
       end
 
       # @rbs () -> Logger
@@ -75,7 +75,7 @@ module RBS
         case tp.event
         when :call
           call_event(tp)
-        when :return, :raise
+        when :return
           return_event(tp, definition)
         end
       rescue StandardError => e
@@ -110,7 +110,7 @@ module RBS
         # TODO: check usecase where decl is nil
         return unless decl
 
-        decl.return_type = tp.event == :return ? [obj_to_class(tp.return_value)] : [NilClass]
+        decl.return_type = [obj_to_class(tp.return_value)]
         definition.decls << decl
       end
 
