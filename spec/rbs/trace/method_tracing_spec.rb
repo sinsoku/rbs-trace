@@ -242,17 +242,17 @@ RSpec.describe RBS::Trace::MethodTracing do
     expect(definition.rbs).to eq("(*untyped, **untyped) -> void")
   end
 
-  it "supports generics with Array and Hash" do
+  it "supports generics with Array, Hash and Range" do
     source = <<~RUBY
       class A
-        def m(x, y)
+        def m(x, y, z)
         end
       end
     RUBY
-    file = trace_source(source, mod) { mod::A.new.m([], {}) }
+    file = trace_source(source, mod) { mod::A.new.m([], {}, 0..10) }
 
     definition = file.definitions["#{mod}::A#m"]
-    expect(definition.rbs).to eq("(Array[untyped], Hash[untyped]) -> void")
+    expect(definition.rbs).to eq("(Array[untyped], Hash[untyped, untyped], Range[untyped]) -> void")
   end
 
   it "supports subclasses of BasicObject" do
