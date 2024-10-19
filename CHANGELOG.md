@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.3.1] - 2024-10-19
+
+- fix: Fix the number of types specified in generics
+- fix: Fix the type of the method that raises the exception
+
 ## [0.3.0] - 2024-10-10
 
 - feat: Support eval
