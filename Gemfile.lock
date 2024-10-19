@@ -51,9 +51,9 @@ GEM
       ffi (~> 1.0)
     rbs (3.5.3)
       logger
-    rbs-inline (0.7.0)
-      prism (>= 0.29, < 0.31)
-      rbs (~> 3.5.0)
+    rbs-inline (0.9.0)
+      prism (>= 0.29, < 1.1)
+      rbs (>= 3.5.0)
     regexp_parser (2.9.2)
     rexml (3.3.6)
       strscan
