@@ -3,7 +3,9 @@
 require "bundler"
 require "logger"
 require "prism"
+require "rbs"
 
+require_relative "trace/builder"
 require_relative "trace/declaration"
 require_relative "trace/definition"
 require_relative "trace/file"

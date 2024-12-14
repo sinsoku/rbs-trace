@@ -19,18 +19,6 @@ module RBS
 
       # @rbs (Declaration) -> Declaration
       def merge: (Declaration) -> Declaration
-
-      private
-
-      # TODO: support block argument
-      # @rbs () -> String
-      def parameters_rbs: () -> String
-
-      # @rbs (Symbol, Symbol, Array[Object]) -> String?
-      def convert: (Symbol, Symbol, Array[Object]) -> String?
-
-      # @rbs (Array[Object]) -> String
-      def convert_type: (Array[Object]) -> String
     end
   end
 end

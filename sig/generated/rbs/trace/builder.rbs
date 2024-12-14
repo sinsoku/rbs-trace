@@ -1,0 +1,30 @@
+# Generated from lib/rbs/trace/builder.rb with RBS::Inline
+
+module RBS
+  module Trace
+    class Builder
+      GENERICS_SIZE: untyped
+
+      # @rbs (Array[untyped]) -> Types::t
+      def parse_classes: (Array[untyped]) -> Types::t
+
+      # @rbs (untyped) -> Types::t
+      def parse_class: (untyped) -> Types::t
+
+      # @rbs (Array[untyped]) -> MethodType
+      def parse_parameters: (Array[untyped]) -> MethodType
+
+      # @rbs () -> Types::Bases::Void
+      def type_void: () -> Types::Bases::Void
+
+      # @rbs () -> Types::Bases::Nil
+      def type_nil: () -> Types::Bases::Nil
+
+      # @rbs () -> Types::Bases::Bool
+      def type_bool: () -> Types::Bases::Bool
+
+      # @rbs () -> Types::Bases::Any
+      def type_untyped: () -> Types::Bases::Any
+    end
+  end
+end

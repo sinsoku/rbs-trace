@@ -18,9 +18,16 @@ module RBS
 
       # @rbs () -> String
       def to_rbs
-        return_rbs = void ? "void" : convert_type(return_type)
+        builder = Builder.new
+        method_type = builder.parse_parameters(@parameters)
+        unless void
+          type = builder.parse_classes(return_type)
+          new_type = method_type.type.with_return_type(type)
+          method_type = method_type.update(type: new_type) # rubocop:disable Style/RedundantSelfAssignment
+        end
 
-        "(#{parameters_rbs}) -> #{return_rbs}"
+        # Trim spaces for backward compatibility
+        "(#{method_type.type.param_to_s}) -> #{method_type.type.return_type}".gsub(" | ", "|")
       end
 
       # @rbs (Declaration) -> Declaration
@@ -36,70 +43,6 @@ module RBS
         end
         Declaration.new(new_parameters, void: void && other.void).tap do |decl|
           decl.return_type = (return_type + other.return_type).uniq
-        end
-      end
-
-      private
-
-      # TODO: support block argument
-      # @rbs () -> String
-      def parameters_rbs
-        converted = {} #: Hash[Symbol, Array[String?]]
-        @parameters.each do |kind, name, klass|
-          converted[kind] ||= [] #: Array[String?]
-          converted[kind] << convert(kind, name, klass)
-        end
-
-        METHOD_KINDS.flat_map { |kind| converted[kind] }.compact.join(", ")
-      end
-
-      # @rbs (Symbol, Symbol, Array[Object]) -> String?
-      def convert(kind, name, klass) # rubocop:disable Metrics/MethodLength
-        type = convert_type(klass)
-        case kind
-        when :req
-          type
-        when :opt
-          "?#{type}"
-        when :rest
-          "*#{type}"
-        when :keyreq
-          "#{name}: #{type}"
-        when :key
-          "?#{name}: #{type}"
-        when :keyrest
-          "**#{type}"
-        end
-      end
-
-      # @rbs (Array[Object]) -> String
-      def convert_type(klass) # rubocop:disable Metrics
-        optional = klass.any? { |k| k == NilClass }
-        types = klass.filter_map do |k|
-          if k == NilClass
-            nil
-          elsif [TrueClass, FalseClass].include?(k) # steep:ignore ArgumentTypeMismatch
-            "bool"
-          elsif [Array, Range].include?(k) # steep:ignore ArgumentTypeMismatch
-            "#{k}[untyped]"
-          elsif k == Hash
-            "#{k}[untyped, untyped]"
-          elsif k == Object
-            "untyped"
-          else
-            k.name # steep:ignore NoMethod
-          end
-        end.uniq
-        type = types.join("|")
-
-        if types.size > 1 && optional
-          "(#{type})?"
-        elsif types.empty?
-          "nil"
-        elsif optional
-          "#{type}?"
-        else
-          type
         end
       end
     end
