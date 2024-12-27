@@ -37,9 +37,13 @@ module RBS
 
       # @rbs (Array[String], Definition) -> boolish
       def skip_insert?(lines, definition)
-        prev = definition.lineno - 2
+        current = definition.lineno - 1
+        prev = current - 1
 
-        definition.decls.empty? || lines[prev]&.include?("# @rbs")
+        definition.decls.empty? ||
+          lines[prev]&.include?("# @rbs") ||
+          lines[prev]&.include?("#:") ||
+          lines[current]&.include?("#:")
       end
 
       # @rbs () -> Enumerator[Definition, void]
