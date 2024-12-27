@@ -35,6 +35,11 @@ module RBS
         @trace ||= TracePoint.new(:call, :return) { |tp| record(tp) }
       end
 
+      # @rbs () -> Environment
+      def env
+        @env ||= Environment.new
+      end
+
       # @rbs () -> Logger
       def logger
         return @logger if defined?(@logger)
@@ -71,6 +76,14 @@ module RBS
       def record(tp) # rubocop:disable Metrics/MethodLength
         return if ignore_path?(tp.path)
 
+        # 1. env を作る
+        # 2. tp からクラス、モジュールのASTを作る
+        # 3. tp からファイルパスを残す
+        # 4. call で stack trace に情報を詰む
+        # 5. return でメソッドのASTを作り、envに追加
+        # 6. ファイルパスを Prism で読む
+        # 7. メソッドのNodeに対してコメントを挿入
+
         file = find_or_new_file(tp.path)
         definition = find_or_new_definition(file, tp)
 
@@ -106,6 +119,11 @@ module RBS
         # steep:ignore:start
         stack_traces << Declaration.new(parameters, void: !assign_return_value?(tp.path, tp.method_id))
         # steep:ignore:end
+
+        #method_type = builder.parse_method_parameters(tp.binding, tp.parse_method_parameters)
+        #return_type = builder.type_void unless assign_return_value?
+
+        #stack_traces << [method_type, return_type]
       end
 
       # @rbs (TracePoint, Definition) -> void
@@ -116,6 +134,17 @@ module RBS
 
         decl.return_type = [obj_to_class(tp.return_value)]
         definition.decls << decl
+
+        #method_type, return_type = stack_traces.pop
+        ## TODO: check usecase where method_type is nil
+        #return unless method_type
+
+        #type = builder.parse_object(tp.return_value)
+        #new_type = method_type.type.with_return_type(type)
+        #method_type = method_type.update(type: new_type) # rubocop:disable Style/RedundantSelfAssignment
+        #return if member.overloads.include?(method_type)
+
+        #member.update(overloads: member.overloads + [method_type])
       end
 
       # @rbs (BasicObject) -> Class

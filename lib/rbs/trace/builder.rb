@@ -23,6 +23,12 @@ module RBS
         end
       end
 
+      # @rbs (BasicObject) -> Types::t
+      def parse_object(object)
+        klass = obj_to_class(object)
+        parse_class(klass)
+      end
+
       # @rbs (untyped) -> Types::t
       def parse_class(klass)
         if [TrueClass, FalseClass].include?(klass)
@@ -34,6 +40,29 @@ module RBS
           args = Array.new(size) { type_untyped }
           Types::ClassInstance.new(name: TypeName(klass.name), args:, location: nil)
         end
+      end
+
+      # @rbs (Binding, Array[untyped]) -> MethodType
+      def parse_method_parameters(bind, parameters)
+        parameters_with_class = parameters.filter_map do |kind, name|
+          # steep:ignore:start
+          value = bind.local_variable_get(name) if name && !%i[* ** &].include?(name)
+          # steep:ignore:end
+          klass = case kind
+                  when :rest
+                    value ? value.map { |v| obj_to_class(v) }.uniq : [Object]
+                  when :keyrest
+                    value ? value.map { |_, v| obj_to_class(v) }.uniq : [Object]
+                  when :block
+                    # TODO: support block argument
+                    next
+                  else
+                    [obj_to_class(value)]
+                  end
+          [kind, name, klass]
+        end
+
+        parse_parameters(parameters_with_class)
       end
 
       # @rbs (Array[untyped]) -> MethodType
