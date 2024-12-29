@@ -19,9 +19,4 @@ task :steep do
   sh "steep check"
 end
 
-default = if RUBY_VERSION.start_with?("3.3")
-            %i[spec rubocop rbs_inline steep]
-          else
-            %i[spec rubocop]
-          end
-task(default:)
+task(default: %i[spec rubocop rbs_inline steep])

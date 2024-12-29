@@ -27,13 +27,8 @@ jobs:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
 
-    - name: Install RBS files
-      if: ${{ matrix.ruby == '3.3' }}
-      run: bundle exec rbs collection install --frozen
-
     - name: Run the default task
       run: bundle exec rake
 
     - name: Check RBS files are committed
-      if: ${{ matrix.ruby == '3.3' }}
       run: git diff --exit-code sig

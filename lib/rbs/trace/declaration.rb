@@ -44,9 +44,9 @@ module RBS
       # TODO: support block argument
       # @rbs () -> String
       def parameters_rbs
-        converted = {}
+        converted = {} #: Hash[Symbol, Array[String?]]
         @parameters.each do |kind, name, klass|
-          converted[kind] ||= []
+          converted[kind] ||= [] #: Array[String?]
           converted[kind] << convert(kind, name, klass)
         end
 

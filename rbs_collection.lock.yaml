@@ -6,10 +6,14 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: f18921b7bd1280daab3ab218b7e3939748515eb1
+    revision: ccbd2bbc6be5c195df1d90aa68d64916a9e7d0ab
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: fileutils
+  version: '0'
+  source:
+    type: stdlib
+- name: json
   version: '0'
   source:
     type: stdlib
@@ -21,8 +25,16 @@ gems:
   version: '0'
   source:
     type: stdlib
+- name: optparse
+  version: '0'
+  source:
+    type: stdlib
+- name: pathname
+  version: '0'
+  source:
+    type: stdlib
 - name: prism
-  version: 0.30.0
+  version: 1.2.0
   source:
     type: rubygems
 - name: rake
@@ -30,7 +42,23 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: f18921b7bd1280daab3ab218b7e3939748515eb1
+    revision: ccbd2bbc6be5c195df1d90aa68d64916a9e7d0ab
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
+- name: rbs
+  version: 3.8.1
+  source:
+    type: rubygems
+- name: rbs-inline
+  version: 0.10.0
+  source:
+    type: rubygems
+- name: rdoc
+  version: '0'
+  source:
+    type: stdlib
+- name: tsort
+  version: '0'
+  source:
+    type: stdlib
 gemfile_lock_path: Gemfile.lock
