@@ -27,7 +27,6 @@ GEM
     diff-lcs (1.5.1)
     drb (2.2.1)
     ffi (1.17.0)
-    ffi (1.17.0-arm64-darwin)
     fileutils (1.7.2)
     i18n (1.14.5)
       concurrent-ruby (~> 1.0)
