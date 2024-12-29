@@ -116,6 +116,13 @@ module RBS
       def type_untyped
         @type_untyped ||= Types::Bases::Any.new(location: nil)
       end
+
+      private
+
+      # @rbs (BasicObject) -> Class
+      def obj_to_class(obj)
+        Object.instance_method(:class).bind_call(obj)
+      end
     end
   end
 end

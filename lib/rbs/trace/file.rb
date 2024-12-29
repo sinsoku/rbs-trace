@@ -3,27 +3,41 @@
 module RBS
   module Trace
     class File
-      # @rbs (String) -> void
-      def initialize(path)
+      # @rbs (String, Environment) -> void
+      def initialize(path, env)
         @path = path
+        @env = env
       end
 
-      # @rbs () -> Hash[String, Definition]
-      def definitions
-        @definitions ||= {}
+      # @rbs (klass: Class, name: Symbol) -> AST::Members::MethodDefinition
+      def find_or_new_method_def_decl(klass:, name:)
+        receiver_decl = find_or_new_receiver_decl(klass)
+
+        kind = klass.singleton_class? ? :singleton : :instance
+        decl = receiver_decl.members.find do |member|
+          member.is_a?(AST::Members::MethodDefinition) &&
+            member.kind == kind &&
+            member.name == name
+        end
+        return decl if decl
+
+        decl = build_method_decl(name, kind)
+        # TODO: Check for problems with mutable operations
+        receiver_decl.members << decl
+        decl
       end
 
       # @rbs () -> String
       def with_rbs
-        lines = ::File.readlines(@path)
-        reverse_definitions.each do |d|
-          next if skip_insert?(lines, d)
+        result = Prism.parse_file(@path)
+        comments = {} # Hash[Integer, String]
+        result.value.accept(InlineCommentVisitor.new(@env, comments))
 
-          current = d.lineno - 1
-          indent = lines[current]&.index("def")
-          next unless indent
+        lines = result.source.source.lines
+        comments.keys.sort.reverse_each do |i|
+          next if skip_insert?(lines, i)
 
-          lines.insert(current, d.rbs_comment(indent))
+          lines.insert(i, comments[i])
         end
         lines.join
       end
@@ -35,20 +49,67 @@ module RBS
 
       private
 
-      # @rbs (Array[String], Definition) -> boolish
-      def skip_insert?(lines, definition)
-        current = definition.lineno - 1
+      # @rbs (Array[String], Integer) -> boolish
+      def skip_insert?(lines, current)
         prev = current - 1
 
-        definition.decls.empty? ||
-          lines[prev]&.include?("# @rbs") ||
-          lines[prev]&.include?("#:") ||
-          lines[current]&.include?("#:")
+        lines[prev]&.include?("# @rbs") ||
+        lines[prev]&.include?("#:") ||
+        lines[current]&.include?("#:")
       end
 
-      # @rbs () -> Enumerator[Definition, void]
-      def reverse_definitions
-        @definitions.values.sort_by { |d| -d.lineno }
+      # @rbs (Class | Module) -> AST::Declarations::Class | AST::Declarations::Module
+      def find_or_new_receiver_decl(klass)
+        # Remove anonymous class names
+        class_name = klass.name.split("::").grep_v(/^#/).join("::")
+        name = TypeName("::#{class_name}")
+
+        entry = @env.module_class_entry(name)
+        return entry.primary.decl if entry
+
+        decl = build_module_class_decl(name, klass)
+        @env << decl
+
+        decl
+      end
+
+      # @rbs (TypeName, Class | Module) -> AST::Declarations::Class | AST::Declarations::Module
+      def build_module_class_decl(name, klass)
+        if klass.is_a?(Class)
+          AST::Declarations::Class.new(
+            name:,
+            type_params: [],
+            super_class: nil,
+            members: [],
+            annotations: [],
+            location: nil,
+            comment: nil
+          )
+        else
+          AST::Declarations::Module.new(
+            name:,
+            type_params: [],
+            self_types: [],
+            members: [],
+            annotations: [],
+            location: nil,
+            comment: nil
+          )
+        end
+      end
+
+      # @rbs (Symbol, :singleton | :instance) -> AST::Members::MethodDefinition
+      def build_method_decl(name, kind)
+        AST::Members::MethodDefinition.new(
+          name:,
+          kind:,
+          overloads: [],
+          annotations: [],
+          location: nil,
+          comment: nil,
+          overloading: false,
+          visibility: nil
+        )
       end
     end
   end

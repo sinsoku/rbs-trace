@@ -55,43 +55,29 @@ module RBS
 
       # @rbs (String) -> File
       def find_or_new_file(path)
-        files[path] ||= File.new(path)
-        files[path]
+        files[path] ||= File.new(path, env)
       end
 
-      # @rbs (File, TracePoint) -> Definition
-      def find_or_new_definition(file, tp)
-        name = tp.method_id
-        is_singleton = tp.defined_class.singleton_class? # steep:ignore NoMethod
-        klass = is_singleton ? tp.self : tp.defined_class
-        mark = is_singleton ? "." : "#"
-        signature = "#{klass}#{mark}#{name}"
-
-        # steep:ignore:start
-        file.definitions[signature] ||= Definition.new(klass:, name:, lineno: tp.lineno)
-        # steep:ignore:end
+      # @rbs () -> Builder
+      def builder
+        @builder ||= Builder.new
       end
 
       # @rbs (TracePoint) -> void
       def record(tp) # rubocop:disable Metrics/MethodLength
         return if ignore_path?(tp.path)
 
-        # 1. env を作る
-        # 2. tp からクラス、モジュールのASTを作る
-        # 3. tp からファイルパスを残す
-        # 4. call で stack trace に情報を詰む
-        # 5. return でメソッドのASTを作り、envに追加
-        # 6. ファイルパスを Prism で読む
-        # 7. メソッドのNodeに対してコメントを挿入
-
         file = find_or_new_file(tp.path)
-        definition = find_or_new_definition(file, tp)
+        member = file.find_or_new_method_def_decl(
+          klass: tp.defined_class,
+          name: tp.method_id,
+        )
 
         case tp.event
         when :call
           call_event(tp)
         when :return
-          return_event(tp, definition)
+          return_event(tp, member)
         end
       rescue StandardError => e
         logger.debug(e)
@@ -99,57 +85,25 @@ module RBS
 
       # @rbs (TracePoint) -> void
       def call_event(tp) # rubocop:disable Metrics
-        parameters = tp.parameters.filter_map do |kind, name| # steep:ignore NoMethod
-          # steep:ignore:start
-          value = tp.binding.local_variable_get(name) if name && !%i[* ** &].include?(name)
-          # steep:ignore:end
-          klass = case kind
-                  when :rest
-                    value ? value.map { |v| obj_to_class(v) }.uniq : [Object]
-                  when :keyrest
-                    value ? value.map { |_, v| obj_to_class(v) }.uniq : [Object]
-                  when :block
-                    # TODO: support block argument
-                    next
-                  else
-                    [obj_to_class(value)]
-                  end
-          [kind, name, klass]
-        end
-        # steep:ignore:start
-        stack_traces << Declaration.new(parameters, void: !assign_return_value?(tp.path, tp.method_id))
-        # steep:ignore:end
+        method_type = builder.parse_method_parameters(tp.binding, tp.parameters)
+        return_type = builder.type_void unless assign_return_value?(tp.path, tp.method_id)
 
-        #method_type = builder.parse_method_parameters(tp.binding, tp.parse_method_parameters)
-        #return_type = builder.type_void unless assign_return_value?
-
-        #stack_traces << [method_type, return_type]
+        stack_traces << [method_type, return_type]
       end
 
-      # @rbs (TracePoint, Definition) -> void
-      def return_event(tp, definition)
-        decl = stack_traces.pop
-        # TODO: check usecase where decl is nil
-        return unless decl
+      # @rbs (TracePoint, AST::Members::MethodDefinition) -> void
+      def return_event(tp, member)
+        method_type, return_type = stack_traces.pop
+        # TODO: check usecase where method_type is nil
+        return unless method_type
 
-        decl.return_type = [obj_to_class(tp.return_value)]
-        definition.decls << decl
+        type = return_type || builder.parse_object(tp.return_value)
+        new_type = method_type.type.with_return_type(type)
+        method_type = method_type.update(type: new_type) # rubocop:disable Style/RedundantSelfAssignment
+        return if member.overloads.include?(method_type)
 
-        #method_type, return_type = stack_traces.pop
-        ## TODO: check usecase where method_type is nil
-        #return unless method_type
-
-        #type = builder.parse_object(tp.return_value)
-        #new_type = method_type.type.with_return_type(type)
-        #method_type = method_type.update(type: new_type) # rubocop:disable Style/RedundantSelfAssignment
-        #return if member.overloads.include?(method_type)
-
-        #member.update(overloads: member.overloads + [method_type])
-      end
-
-      # @rbs (BasicObject) -> Class
-      def obj_to_class(obj)
-        Object.instance_method(:class).bind_call(obj)
+        # TODO: Check for problems with mutable operations
+        member.overloads << method_type
       end
 
       # @rbs (String) -> bool

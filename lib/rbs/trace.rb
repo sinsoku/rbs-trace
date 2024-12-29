@@ -9,6 +9,7 @@ require_relative "trace/builder"
 require_relative "trace/declaration"
 require_relative "trace/definition"
 require_relative "trace/file"
+require_relative "trace/inline_comment_visitor"
 require_relative "trace/method_tracing"
 require_relative "trace/version"
 
