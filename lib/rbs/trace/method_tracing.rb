@@ -125,7 +125,7 @@ module RBS
 
       # @rbs (String) -> bool
       def ignore_path?(path)
-        bundle_path = Bundler.bundle_path.to_s # steep:ignore NoMethod
+        bundle_path = Bundler.bundle_path.to_s # steep:ignore UnknownConstant
         ruby_lib_path = RbConfig::CONFIG["rubylibdir"]
 
         path.start_with?("<internal") ||
