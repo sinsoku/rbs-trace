@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.3.2] - 2024-12-29
+
+- fix: Do not insert comments if comment `#:` exists
+
 ## [0.3.1] - 2024-10-19
 
 - fix: Fix the number of types specified in generics
