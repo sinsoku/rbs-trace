@@ -35,5 +35,4 @@ jobs:
       run: bundle exec rake
 
     - name: Check RBS files are committed
-      if: ${{ matrix.ruby == '3.3' }}
       run: git diff --exit-code sig
