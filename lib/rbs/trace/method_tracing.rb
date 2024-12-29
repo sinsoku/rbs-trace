@@ -57,12 +57,14 @@ module RBS
       # @rbs (File, TracePoint) -> Definition
       def find_or_new_definition(file, tp)
         name = tp.method_id
-        is_singleton = tp.defined_class.singleton_class?
+        is_singleton = tp.defined_class.singleton_class? # steep:ignore NoMethod
         klass = is_singleton ? tp.self : tp.defined_class
         mark = is_singleton ? "." : "#"
         signature = "#{klass}#{mark}#{name}"
 
+        # steep:ignore:start
         file.definitions[signature] ||= Definition.new(klass:, name:, lineno: tp.lineno)
+        # steep:ignore:end
       end
 
       # @rbs (TracePoint) -> void
@@ -84,7 +86,7 @@ module RBS
 
       # @rbs (TracePoint) -> void
       def call_event(tp) # rubocop:disable Metrics
-        parameters = tp.parameters.filter_map do |kind, name|
+        parameters = tp.parameters.filter_map do |kind, name| # steep:ignore NoMethod
           # steep:ignore:start
           value = tp.binding.local_variable_get(name) if name && !%i[* ** &].include?(name)
           # steep:ignore:end
@@ -101,7 +103,9 @@ module RBS
                   end
           [kind, name, klass]
         end
+        # steep:ignore:start
         stack_traces << Declaration.new(parameters, void: !assign_return_value?(tp.path, tp.method_id))
+        # steep:ignore:end
       end
 
       # @rbs (TracePoint, Definition) -> void
@@ -121,7 +125,7 @@ module RBS
 
       # @rbs (String) -> bool
       def ignore_path?(path)
-        bundle_path = Bundler.bundle_path.to_s # steep:ignore UnknownConstant
+        bundle_path = Bundler.bundle_path.to_s # steep:ignore NoMethod
         ruby_lib_path = RbConfig::CONFIG["rubylibdir"]
 
         path.start_with?("<internal") ||
@@ -169,7 +173,7 @@ module RBS
       def parsed_nodes(path)
         return unless ::File.exist?(path)
 
-        @parsed_nodes ||= {}
+        @parsed_nodes ||= {} #: Hash[String, Prism::ParseResult]
         @parsed_nodes[path] ||= Prism.parse_file(path)
         @parsed_nodes[path].value
       end
