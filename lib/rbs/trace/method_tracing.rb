@@ -35,11 +35,6 @@ module RBS
         @trace ||= TracePoint.new(:call, :return) { |tp| record(tp) }
       end
 
-      # @rbs () -> Environment
-      def env
-        @env ||= Environment.new
-      end
-
       # @rbs () -> Logger
       def logger
         return @logger if defined?(@logger)
@@ -48,36 +43,22 @@ module RBS
         @logger = Logger.new($stdout, level:)
       end
 
-      # @rbs () -> Array[Declaration]
-      def stack_traces
-        @stack_traces ||= []
-      end
-
-      # @rbs (String) -> File
-      def find_or_new_file(path)
-        files[path] ||= File.new(path, env)
-      end
-
       # @rbs () -> Builder
       def builder
-        @builder ||= Builder.new
+        @builder ||= EnvironmentBuilder.new
       end
 
       # @rbs (TracePoint) -> void
-      def record(tp) # rubocop:disable Metrics/MethodLength
+      def record(tp)
         return if ignore_path?(tp.path)
 
-        file = find_or_new_file(tp.path)
-        member = file.find_or_new_method_def_decl(
-          klass: tp.defined_class,
-          name: tp.method_id,
-        )
+        files[tp.path] ||= File.new(tp.path, builder.env)
 
         case tp.event
         when :call
           call_event(tp)
         when :return
-          return_event(tp, member)
+          return_event(tp)
         end
       rescue StandardError => e
         logger.debug(e)
@@ -85,25 +66,22 @@ module RBS
 
       # @rbs (TracePoint) -> void
       def call_event(tp) # rubocop:disable Metrics
-        method_type = builder.parse_method_parameters(tp.binding, tp.parameters)
-        return_type = builder.type_void unless assign_return_value?(tp.path, tp.method_id)
-
-        stack_traces << [method_type, return_type]
+        builder.method_call(
+          object: tp.self,
+          name: tp.method_id,
+          bind: tp.binding,
+          parameters: tp.parameters,
+          void: !assign_return_value?(tp.path, tp.method_id)
+        )
       end
 
-      # @rbs (TracePoint, AST::Members::MethodDefinition) -> void
-      def return_event(tp, member)
-        method_type, return_type = stack_traces.pop
-        # TODO: check usecase where method_type is nil
-        return unless method_type
-
-        type = return_type || builder.parse_object(tp.return_value)
-        new_type = method_type.type.with_return_type(type)
-        method_type = method_type.update(type: new_type) # rubocop:disable Style/RedundantSelfAssignment
-        return if member.overloads.include?(method_type)
-
-        # TODO: Check for problems with mutable operations
-        member.overloads << method_type
+      # @rbs (TracePoint) -> void
+      def return_event(tp)
+        builder.method_return(
+          object: tp.self,
+          name: tp.method_id,
+          return_value: tp.return_value
+        )
       end
 
       # @rbs (String) -> bool
