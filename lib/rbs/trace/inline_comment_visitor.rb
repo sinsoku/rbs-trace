@@ -32,12 +32,14 @@ module RBS
               member.name == node.name
           end
 
+          # TODO: merge overloads?
           if member
             index = node.location.start_line - 1
             indent = " " * node.location.start_column
-            method_type = member.overloads[0]
+            method_types = member.overloads.map(&:method_type)
+            rbs = method_types.join(" | ")
 
-            @comments[index] = "#{indent}# @rbs #{method_type}\n"
+            @comments[index] = "#{indent}# @rbs #{rbs}\n"
           end
         end
 

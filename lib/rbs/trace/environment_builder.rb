@@ -36,10 +36,11 @@ module RBS
         type = return_type || parse_object(return_value)
         new_type = method_type.type.with_return_type(type)
         method_type = method_type.update(type: new_type) # rubocop:disable Style/RedundantSelfAssignment
-        return if member.overloads.include?(method_type)
+        overload = RBS::AST::Members::MethodDefinition::Overload.new(method_type:, annotations: [])
+        return if member.overloads.include?(overload)
 
         # TODO: Check for problems with mutable operations
-        member.overloads << method_type
+        member.overloads << overload
       end
 
       private
@@ -124,7 +125,7 @@ module RBS
           # steep:ignore:start
           value = bind.local_variable_get(name) if name && !%i[* ** &].include?(name)
           # steep:ignore:end
-          klass = case kind
+          classes = case kind
                   when :rest
                     value ? value.map { |v| obj_to_class(v) }.uniq : [Object]
                   when :keyrest
@@ -135,7 +136,7 @@ module RBS
                   else
                     [obj_to_class(value)]
                   end
-          [kind, name, klass]
+          [kind, name, classes]
         end
 
         parse_parameters(parameters_with_class)
