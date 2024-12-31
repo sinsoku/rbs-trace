@@ -3,6 +3,7 @@ PATH
   specs:
     rbs-trace (0.3.2)
       prism (>= 0.3.0)
+      rbs (>= 3.5.0)
 
 GEM
   remote: https://rubygems.org/

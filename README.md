@@ -123,6 +123,12 @@ tracing.files.each do |path, file|
 end
 ```
 
+### Save as RBS files
+
+```ruby
+tracing.save_rbs("sig/trace/")
+```
+
 ### Enable debug logging
 
 If you want to enable debug logging, specify the environment variable `RBS_TRACE_DEBUG`.
