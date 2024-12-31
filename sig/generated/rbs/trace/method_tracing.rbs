@@ -21,6 +21,9 @@ module RBS
       # @rbs () -> void
       def insert_rbs: () -> void
 
+      # @rbs (String) -> void
+      def save_rbs: (String) -> void
+
       private
 
       # @rbs () -> TracePoint
@@ -29,14 +32,11 @@ module RBS
       # @rbs () -> Logger
       def logger: () -> Logger
 
-      # @rbs () -> Array[Declaration]
-      def stack_traces: () -> Array[Declaration]
+      # @rbs () -> Builder
+      def builder: () -> Builder
 
       # @rbs (String) -> File
       def find_or_new_file: (String) -> File
-
-      # @rbs (File, TracePoint) -> Definition
-      def find_or_new_definition: (File, TracePoint) -> Definition
 
       # @rbs (TracePoint) -> void
       def record: (TracePoint) -> void
@@ -44,8 +44,8 @@ module RBS
       # @rbs (TracePoint) -> void
       def call_event: (TracePoint) -> void
 
-      # @rbs (TracePoint, Definition) -> void
-      def return_event: (TracePoint, Definition) -> void
+      # @rbs (TracePoint, AST::Members::MethodDefinition) -> void
+      def return_event: (TracePoint, AST::Members::MethodDefinition) -> void
 
       # @rbs (BasicObject) -> Class
       def obj_to_class: (BasicObject) -> Class

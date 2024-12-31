@@ -3,11 +3,13 @@
 module RBS
   module Trace
     class File
-      # @rbs (String) -> void
-      def initialize: (String) -> void
+      include Helpers
 
-      # @rbs () -> Hash[String, Definition]
-      def definitions: () -> Hash[String, Definition]
+      # @rbs (String, ?Hash[TypeName, AST::Declarations::t]) -> void
+      def initialize: (String, ?Hash[TypeName, AST::Declarations::t]) -> void
+
+      # @rbs (untyped, Class, Symbol) -> AST::Members::MethodDefinition?
+      def find_or_new_method_definition: (untyped, Class, Symbol) -> AST::Members::MethodDefinition?
 
       # @rbs () -> String
       def with_rbs: () -> String
@@ -15,13 +17,22 @@ module RBS
       # @rbs () -> void
       def rewrite: () -> void
 
+      # @rbs () -> String
+      def to_rbs: () -> String
+
+      # @rbs (String) -> void
+      def save_rbs: (String) -> void
+
       private
 
-      # @rbs (Array[String], Definition) -> boolish
-      def skip_insert?: (Array[String], Definition) -> boolish
+      # @rbs (Array[String], Integer) -> boolish
+      def skip_insert?: (Array[String], Integer) -> boolish
 
-      # @rbs () -> Enumerator[Definition, void]
-      def reverse_definitions: () -> Enumerator[Definition, void]
+      # @rbs (Class | Module) -> (AST::Declarations::Class | AST::Declarations::Module)?
+      def find_or_new_receiver_decl: (Class | Module) -> (AST::Declarations::Class | AST::Declarations::Module)?
+
+      # @rbs (String) -> Pathname
+      def calc_rbs_path: (String) -> Pathname
     end
   end
 end

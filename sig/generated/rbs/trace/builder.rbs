@@ -1,0 +1,33 @@
+# Generated from lib/rbs/trace/builder.rb with RBS::Inline
+
+module RBS
+  module Trace
+    class Builder
+      include Helpers
+
+      GENERICS_SIZE: untyped
+
+      # @rbs (bind: Binding, parameters: Array[__todo__], void: bool) -> void
+      def method_call: (bind: Binding, parameters: Array[__todo__], void: bool) -> void
+
+      # @rbs (__todo__) -> AST::Members::MethodDefinition::Overload
+      def method_return: (__todo__) -> AST::Members::MethodDefinition::Overload
+
+      private
+
+      def stack_traces: () -> untyped
+
+      # @rbs (Binding, Array[__todo__]) -> MethodType
+      def parse_parameters: (Binding, Array[__todo__]) -> MethodType
+
+      # @rbs (Array[untyped]) -> Types::t
+      def parse_classes: (Array[untyped]) -> Types::t
+
+      # @rbs (untyped) -> Types::t
+      def parse_class: (untyped) -> Types::t
+
+      # @rbs (BasicObject) -> Types::t
+      def parse_object: (BasicObject) -> Types::t
+    end
+  end
+end
