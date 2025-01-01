@@ -1,0 +1,27 @@
+# Generated from lib/rbs/trace/inline_comment_visitor.rb with RBS::Inline
+
+module RBS
+  module Trace
+    class InlineCommentVisitor < Prism::Visitor
+      # @rbs (Hash[TypeName, AST::Declarations::t], Hash[Integer, String]) -> void
+      def initialize: (Hash[TypeName, AST::Declarations::t], Hash[Integer, String]) -> void
+
+      # @rbs override
+      # @rbs (Prism::Node) -> void
+      def visit_class_node: ...
+
+      # @rbs override
+      # @rbs (Prism::Node) -> void
+      def visit_module_node: ...
+
+      # @rbs override
+      # @rbs (Prism::Node) -> void
+      def visit_def_node: ...
+
+      private
+
+      # @rbs (Symbol) -> AST::Members::MethodDefinition?
+      def find_method_definition: (Symbol) -> AST::Members::MethodDefinition?
+    end
+  end
+end

@@ -4,7 +4,7 @@ require "tempfile"
 
 module TraceHelper
   def trace_source(source, mod, &)
-    tf = Tempfile.open do |fp|
+    tf = Tempfile.open(["", ".rb"]) do |fp|
       fp.write(source)
       fp
     end
