@@ -1,5 +1,6 @@
 [![Gem Version](https://badge.fury.io/rb/rbs-trace.svg)](https://badge.fury.io/rb/rbs-trace)
 [![Test](https://github.com/sinsoku/rbs-trace/actions/workflows/test.yml/badge.svg)](https://github.com/sinsoku/rbs-trace/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/sinsoku/rbs-trace/graph/badge.svg?token=rEsPe8Quyu)](https://codecov.io/gh/sinsoku/rbs-trace)
 
 # RBS::Trace
 

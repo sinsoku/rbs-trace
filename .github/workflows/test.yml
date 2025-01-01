@@ -32,3 +32,9 @@ jobs:
 
     - name: Check RBS files are committed
       run: git diff --exit-code sig
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: coverage/coverage.xml

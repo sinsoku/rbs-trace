@@ -11,6 +11,8 @@ gem "rspec"
 gem "rubocop", require: false
 gem "rubocop-rake", require: false
 gem "rubocop-rspec", require: false
+gem "simplecov"
+gem "simplecov-cobertura"
 gem "steep", require: false
 
 # To require Ruby 3.2 or higher from activesupport v8.0.0

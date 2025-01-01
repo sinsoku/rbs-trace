@@ -1,5 +1,18 @@
 # frozen_string_literal: true
 
+require "simplecov"
+SimpleCov.start do
+  add_filter "/spec/"
+
+  enable_coverage :branch
+  primary_coverage :branch
+end
+
+if ENV["CI"]
+  require "simplecov-cobertura"
+  SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
+end
+
 require "rbs/trace"
 
 RSpec.configure do |config|
