@@ -8,6 +8,13 @@ module RBS
                                embedded_statements_node].freeze #: Array[Symbol]
       private_constant :ASSIGNED_NODE_TYPES
 
+      # @rbs (?log_level: Symbol, ?raises: bool) -> void
+      def initialize(log_level: nil, raises: false)
+        @log_level = log_level
+        @log_level ||= ENV["RBS_TRACE_DEBUG"] ? :debug : :info
+        @raises = raises
+      end
+
       # @rbs [T] () { () -> T } -> T
       def enable(&)
         trace.enable(&)
@@ -37,10 +44,7 @@ module RBS
 
       # @rbs () -> Logger
       def logger
-        return @logger if defined?(@logger)
-
-        level = ENV["RBS_TRACE_DEBUG"] ? :debug : :info
-        @logger = Logger.new($stdout, level:)
+        @logger ||= Logger.new($stdout, level: @log_level)
       end
 
       # @rbs () -> Array[Declaration]
@@ -82,6 +86,7 @@ module RBS
         end
       rescue StandardError => e
         logger.debug(e)
+        raise(e) if @raises
       end
 
       # @rbs (TracePoint) -> void

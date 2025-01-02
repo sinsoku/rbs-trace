@@ -10,7 +10,7 @@ module TraceHelper
     end
     load(tf.path, mod)
 
-    tracing = RBS::Trace::MethodTracing.new
+    tracing = RBS::Trace::MethodTracing.new(log_level: :debug, raises: true)
     tracing.enable(&)
     tracing.files[tf.path]
   end

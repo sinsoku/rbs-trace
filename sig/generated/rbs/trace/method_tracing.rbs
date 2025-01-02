@@ -6,6 +6,9 @@ module RBS
       # rubocop:disable Metrics/ClassLength
       ASSIGNED_NODE_TYPES: Array[Symbol]
 
+      # @rbs (?log_level: Symbol, ?raises: bool) -> void
+      def initialize: (?log_level: Symbol, ?raises: bool) -> void
+
       # @rbs [T] () { () -> T } -> T
       def enable: [T] () { () -> T } -> T
 
