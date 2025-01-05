@@ -35,6 +35,11 @@ module RBS
         files.each_value(&:rewrite)
       end
 
+      # @rbs (String) -> void
+      def save_rbs(out_dir)
+        files.each_value { |file| file.save_rbs(out_dir) }
+      end
+
       private
 
       # @rbs () -> TracePoint
@@ -47,28 +52,14 @@ module RBS
         @logger ||= Logger.new($stdout, level: @log_level)
       end
 
-      # @rbs () -> Array[Declaration]
-      def stack_traces
-        @stack_traces ||= []
+      # @rbs () -> Builder
+      def builder
+        @builder ||= Builder.new
       end
 
       # @rbs (String) -> File
       def find_or_new_file(path)
         files[path] ||= File.new(path)
-        files[path]
-      end
-
-      # @rbs (File, TracePoint) -> Definition
-      def find_or_new_definition(file, tp)
-        name = tp.method_id
-        is_singleton = tp.defined_class.singleton_class? # steep:ignore NoMethod
-        klass = is_singleton ? tp.self : tp.defined_class
-        mark = is_singleton ? "." : "#"
-        signature = "#{klass}#{mark}#{name}"
-
-        # steep:ignore:start
-        file.definitions[signature] ||= Definition.new(klass:, name:, lineno: tp.lineno)
-        # steep:ignore:end
       end
 
       # @rbs (TracePoint) -> void
@@ -76,13 +67,16 @@ module RBS
         return if ignore_path?(tp.path)
 
         file = find_or_new_file(tp.path)
-        definition = find_or_new_definition(file, tp)
+        # steep:ignore:start
+        member = file.find_or_new_method_definition(tp.self, tp.defined_class, tp.method_id)
+        # steep:ignore:end
+        return unless member
 
         case tp.event
         when :call
           call_event(tp)
         when :return
-          return_event(tp, definition)
+          return_event(tp, member)
         end
       rescue StandardError => e
         logger.debug(e)
@@ -90,37 +84,22 @@ module RBS
       end
 
       # @rbs (TracePoint) -> void
-      def call_event(tp) # rubocop:disable Metrics
-        parameters = tp.parameters.filter_map do |kind, name| # steep:ignore NoMethod
-          # steep:ignore:start
-          value = tp.binding.local_variable_get(name) if name && !%i[* ** &].include?(name)
-          # steep:ignore:end
-          klass = case kind
-                  when :rest
-                    value ? value.map { |v| obj_to_class(v) }.uniq : [Object]
-                  when :keyrest
-                    value ? value.map { |_, v| obj_to_class(v) }.uniq : [Object]
-                  when :block
-                    # TODO: support block argument
-                    next
-                  else
-                    [obj_to_class(value)]
-                  end
-          [kind, name, klass]
-        end
+      def call_event(tp)
         # steep:ignore:start
-        stack_traces << Declaration.new(parameters, void: !assign_return_value?(tp.path, tp.method_id))
+        builder.method_call(
+          bind: tp.binding,
+          parameters: tp.parameters,
+          void: !assign_return_value?(tp.path, tp.method_id)
+        )
         # steep:ignore:end
       end
 
-      # @rbs (TracePoint, Definition) -> void
-      def return_event(tp, definition)
-        decl = stack_traces.pop
-        # TODO: check usecase where decl is nil
-        return unless decl
+      # @rbs (TracePoint, AST::Members::MethodDefinition) -> void
+      def return_event(tp, member)
+        overload = builder.method_return(tp.return_value)
+        return if member.overloads.include?(overload)
 
-        decl.return_type = [obj_to_class(tp.return_value)]
-        definition.decls << decl
+        member.overloads << overload
       end
 
       # @rbs (BasicObject) -> Class
@@ -130,7 +109,9 @@ module RBS
 
       # @rbs (String) -> bool
       def ignore_path?(path)
-        bundle_path = Bundler.bundle_path.to_s # steep:ignore UnknownConstant
+        # steep:ignore:start
+        bundle_path = Bundler.bundle_path.to_s
+        # steep:ignore:end
         ruby_lib_path = RbConfig::CONFIG["rubylibdir"]
 
         path.start_with?("<internal") ||

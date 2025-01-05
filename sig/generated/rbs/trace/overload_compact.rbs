@@ -1,0 +1,21 @@
+# Generated from lib/rbs/trace/overload_compact.rb with RBS::Inline
+
+module RBS
+  module Trace
+    class OverloadCompact
+      # @rbs (Array[AST::Members::MethodDefinition::Overload]) -> void
+      def initialize: (Array[AST::Members::MethodDefinition::Overload]) -> void
+
+      # @rbs () -> Array[AST::Members::MethodDefinition::Overload]
+      def call: () -> Array[AST::Members::MethodDefinition::Overload]
+
+      private
+
+      # @rbs (Array[MethodType]) -> MethodType
+      def merge_method_types: (Array[MethodType]) -> MethodType
+
+      # @rbs (Array[Types::t]) -> Types::t
+      def merge_types: (Array[Types::t]) -> Types::t
+    end
+  end
+end

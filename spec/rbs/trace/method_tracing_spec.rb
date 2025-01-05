@@ -11,9 +11,13 @@ RSpec.describe RBS::Trace::MethodTracing do
       end
     RUBY
     file = trace_source(source, mod) { mod::A.new.m }
-
-    definition = file.definitions["#{mod}::A#m"]
-    expect(definition.rbs).to eq("() -> void")
+    expect(file.with_rbs).to eq(<<~RUBY)
+      class A
+        # @rbs () -> void
+        def m
+        end
+      end
+    RUBY
   end
 
   it "supports instance methods with req arguments" do
@@ -24,9 +28,13 @@ RSpec.describe RBS::Trace::MethodTracing do
       end
     RUBY
     file = trace_source(source, mod) { mod::A.new.m(1) }
-
-    definition = file.definitions["#{mod}::A#m"]
-    expect(definition.rbs).to eq("(Integer) -> void")
+    expect(file.with_rbs).to eq(<<~RUBY)
+      class A
+        # @rbs (Integer) -> void
+        def m(x)
+        end
+      end
+    RUBY
   end
 
   it "supports instance methods with opt arguments" do
@@ -37,9 +45,13 @@ RSpec.describe RBS::Trace::MethodTracing do
       end
     RUBY
     file = trace_source(source, mod) { mod::A.new.m }
-
-    definition = file.definitions["#{mod}::A#m"]
-    expect(definition.rbs).to eq("(?Integer) -> void")
+    expect(file.with_rbs).to eq(<<~RUBY)
+      class A
+        # @rbs (?Integer) -> void
+        def m(x = 1)
+        end
+      end
+    RUBY
   end
 
   it "supports instance methods with rest arguments" do
@@ -50,9 +62,13 @@ RSpec.describe RBS::Trace::MethodTracing do
       end
     RUBY
     file = trace_source(source, mod) { mod::A.new.m(1, 2) }
-
-    definition = file.definitions["#{mod}::A#m"]
-    expect(definition.rbs).to eq("(*Integer) -> void")
+    expect(file.with_rbs).to eq(<<~RUBY)
+      class A
+        # @rbs (*Integer) -> void
+        def m(*x)
+        end
+      end
+    RUBY
   end
 
   it "supports instance methods with keyreq arguments" do
@@ -63,9 +79,13 @@ RSpec.describe RBS::Trace::MethodTracing do
       end
     RUBY
     file = trace_source(source, mod) { mod::A.new.m(x: 1) }
-
-    definition = file.definitions["#{mod}::A#m"]
-    expect(definition.rbs).to eq("(x: Integer) -> void")
+    expect(file.with_rbs).to eq(<<~RUBY)
+      class A
+        # @rbs (x: Integer) -> void
+        def m(x:)
+        end
+      end
+    RUBY
   end
 
   it "supports instance methods with key arguments" do
@@ -76,9 +96,13 @@ RSpec.describe RBS::Trace::MethodTracing do
       end
     RUBY
     file = trace_source(source, mod) { mod::A.new.m }
-
-    definition = file.definitions["#{mod}::A#m"]
-    expect(definition.rbs).to eq("(?x: Integer) -> void")
+    expect(file.with_rbs).to eq(<<~RUBY)
+      class A
+        # @rbs (?x: Integer) -> void
+        def m(x: 0)
+        end
+      end
+    RUBY
   end
 
   it "supports instance methods with keyrest arguments" do
@@ -89,9 +113,13 @@ RSpec.describe RBS::Trace::MethodTracing do
       end
     RUBY
     file = trace_source(source, mod) { mod::A.new.m(x: 1, y: 2) }
-
-    definition = file.definitions["#{mod}::A#m"]
-    expect(definition.rbs).to eq("(**Integer) -> void")
+    expect(file.with_rbs).to eq(<<~RUBY)
+      class A
+        # @rbs (**Integer) -> void
+        def m(**opts)
+        end
+      end
+    RUBY
   end
 
   it "supports instance methods with raise" do
@@ -108,8 +136,14 @@ RSpec.describe RBS::Trace::MethodTracing do
       nil
     end
 
-    definition = file.definitions["#{mod}::A#m"]
-    expect(definition.rbs).to eq("() -> void")
+    expect(file.with_rbs).to eq(<<~RUBY)
+      class A
+        # @rbs () -> void
+        def m
+          raise "error"
+        end
+      end
+    RUBY
   end
 
   it "supports methods that call methods that raise exceptions" do # rubocop:disable RSpec/ExampleLength
@@ -130,8 +164,19 @@ RSpec.describe RBS::Trace::MethodTracing do
       nil
     end
 
-    def_m = file.definitions["#{mod}::A#m"]
-    expect(def_m.rbs).to eq("(Integer) -> void")
+    expect(file.with_rbs).to eq(<<~RUBY)
+      class A
+        # @rbs (Integer) -> void
+        def m(x)
+          foo
+        end
+
+        # @rbs () -> void
+        def foo
+          raise "error"
+        end
+      end
+    RUBY
   end
 
   it "supports singleton methods" do
@@ -142,9 +187,13 @@ RSpec.describe RBS::Trace::MethodTracing do
       end
     RUBY
     file = trace_source(source, mod) { mod::A.m }
-
-    definition = file.definitions["#{mod}::A.m"]
-    expect(definition.rbs).to eq("() -> void")
+    expect(file.with_rbs).to eq(<<~RUBY)
+      class A
+        # @rbs () -> void
+        def self.m
+        end
+      end
+    RUBY
   end
 
   it "supports Union type arguments" do
@@ -160,8 +209,13 @@ RSpec.describe RBS::Trace::MethodTracing do
       obj.m("a")
     end
 
-    definition = file.definitions["#{mod}::A#m"]
-    expect(definition.rbs).to eq("(Integer|String) -> void")
+    expect(file.with_rbs).to eq(<<~RUBY)
+      class A
+        # @rbs (Integer | String) -> void
+        def m(x)
+        end
+      end
+    RUBY
   end
 
   it "supports Union type return value" do
@@ -178,8 +232,14 @@ RSpec.describe RBS::Trace::MethodTracing do
       result_str = obj.m(false) # rubocop:disable Lint/UselessAssignment
     end
 
-    definition = file.definitions["#{mod}::A#m"]
-    expect(definition.rbs).to eq("(bool) -> Integer|String")
+    expect(file.with_rbs).to eq(<<~RUBY)
+      class A
+        # @rbs (bool) -> (Integer | String)
+        def m(is_int)
+          is_int ? 1 : "a"
+        end
+      end
+    RUBY
   end
 
   it "supports Optional type arguments" do
@@ -195,8 +255,13 @@ RSpec.describe RBS::Trace::MethodTracing do
       obj.m(nil)
     end
 
-    definition = file.definitions["#{mod}::A#m"]
-    expect(definition.rbs).to eq("(Integer?) -> void")
+    expect(file.with_rbs).to eq(<<~RUBY)
+      class A
+        # @rbs (Integer?) -> void
+        def m(x)
+        end
+      end
+    RUBY
   end
 
   it "if the argument is nil, the RBS argument will also be nil" do
@@ -207,9 +272,13 @@ RSpec.describe RBS::Trace::MethodTracing do
       end
     RUBY
     file = trace_source(source, mod) { mod::A.new.m(nil) }
-
-    definition = file.definitions["#{mod}::A#m"]
-    expect(definition.rbs).to eq("(nil) -> void")
+    expect(file.with_rbs).to eq(<<~RUBY)
+      class A
+        # @rbs (nil) -> void
+        def m(x)
+        end
+      end
+    RUBY
   end
 
   it "ignores a method generated by class_eval" do
@@ -237,9 +306,13 @@ RSpec.describe RBS::Trace::MethodTracing do
       end
     RUBY
     file = trace_source(source, mod) { mod::A.new.m }
-
-    definition = file.definitions["#{mod}::A#m"]
-    expect(definition.rbs).to eq("(*untyped, **untyped) -> void")
+    expect(file.with_rbs).to eq(<<~RUBY)
+      class A
+        # @rbs (*untyped, **untyped) -> void
+        def m(*, **, &)
+        end
+      end
+    RUBY
   end
 
   it "supports generics with Array, Hash and Range" do
@@ -250,9 +323,13 @@ RSpec.describe RBS::Trace::MethodTracing do
       end
     RUBY
     file = trace_source(source, mod) { mod::A.new.m([], {}, 0..10) }
-
-    definition = file.definitions["#{mod}::A#m"]
-    expect(definition.rbs).to eq("(Array[untyped], Hash[untyped, untyped], Range[untyped]) -> void")
+    expect(file.with_rbs).to eq(<<~RUBY)
+      class A
+        # @rbs (Array[untyped], Hash[untyped, untyped], Range[untyped]) -> void
+        def m(x, y, z)
+        end
+      end
+    RUBY
   end
 
   it "supports subclasses of BasicObject" do
@@ -266,9 +343,14 @@ RSpec.describe RBS::Trace::MethodTracing do
     file = trace_source(source, mod) do
       obj = mod::A.new.m(mod::A.new) # rubocop:disable Lint/UselessAssignment
     end
-
-    definition = file.definitions["#{mod}::A#m"]
-    expect(definition.rbs).to eq("(#{mod}::A) -> #{mod}::A")
+    expect(file.with_rbs).to eq(<<~RUBY)
+      class A < BasicObject
+        # @rbs (#{mod}::A) -> #{mod}::A
+        def m(x)
+          A.new
+        end
+      end
+    RUBY
   end
 
   it "supports eval, but the retrun value is always void" do
@@ -281,8 +363,12 @@ RSpec.describe RBS::Trace::MethodTracing do
     file = trace_source(source, mod) do
       obj = eval("mod::A.new.m") # rubocop:disable Lint/UselessAssignment, Style/EvalWithLocation
     end
-
-    definition = file.definitions["#{mod}::A#m"]
-    expect(definition.rbs).to eq("() -> void")
+    expect(file.with_rbs).to eq(<<~RUBY)
+      class A
+        # @rbs () -> void
+        def m
+        end
+      end
+    RUBY
   end
 end

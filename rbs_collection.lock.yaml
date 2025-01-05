@@ -13,11 +13,23 @@ gems:
   version: '0'
   source:
     type: stdlib
+- name: json
+  version: '0'
+  source:
+    type: stdlib
 - name: logger
   version: '0'
   source:
     type: stdlib
 - name: monitor
+  version: '0'
+  source:
+    type: stdlib
+- name: optparse
+  version: '0'
+  source:
+    type: stdlib
+- name: pathname
   version: '0'
   source:
     type: stdlib
@@ -33,4 +45,16 @@ gems:
     revision: ccbd2bbc6be5c195df1d90aa68d64916a9e7d0ab
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
+- name: rbs
+  version: 3.8.1
+  source:
+    type: rubygems
+- name: rdoc
+  version: '0'
+  source:
+    type: stdlib
+- name: tsort
+  version: '0'
+  source:
+    type: stdlib
 gemfile_lock_path: Gemfile.lock
