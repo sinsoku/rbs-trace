@@ -116,6 +116,7 @@ module RBS
 
         path.start_with?("<internal") ||
           path.start_with?("(eval") ||
+          path.start_with?("inline template") ||
           path.start_with?(bundle_path) ||
           path.start_with?(ruby_lib_path) ||
           path.start_with?(__FILE__)
