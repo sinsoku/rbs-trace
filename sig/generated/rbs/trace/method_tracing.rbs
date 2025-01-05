@@ -6,6 +6,18 @@ module RBS
       # rubocop:disable Metrics/ClassLength
       ASSIGNED_NODE_TYPES: Array[Symbol]
 
+      # steep:ignore:start
+      BUNDLE_PATH: String
+
+      # steep:ignore:end
+      RUBY_LIB_PATH: String
+
+      PATH_INTERNAL: String
+
+      PATH_EVAL: String
+
+      PATH_INLINE_TEMPLATE: String
+
       # @rbs (?log_level: Symbol, ?raises: bool) -> void
       def initialize: (?log_level: Symbol, ?raises: bool) -> void
 

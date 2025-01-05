@@ -6,7 +6,16 @@ module RBS
       ASSIGNED_NODE_TYPES = %i[statements_node local_variable_write_node instance_variable_write_node
                                class_variable_write_node constant_write_node call_node
                                embedded_statements_node].freeze #: Array[Symbol]
-      private_constant :ASSIGNED_NODE_TYPES
+      # steep:ignore:start
+      BUNDLE_PATH = Bundler.bundle_path.to_s #: String
+      # steep:ignore:end
+      RUBY_LIB_PATH = RbConfig::CONFIG["rubylibdir"] #: String
+      PATH_INTERNAL = "<internal" #: String
+      PATH_EVAL = "(eval" #: String
+      PATH_INLINE_TEMPLATE = "inline template" #: String
+
+      private_constant :ASSIGNED_NODE_TYPES, :BUNDLE_PATH, :RUBY_LIB_PATH, :PATH_INTERNAL, :PATH_EVAL,
+                       :PATH_INLINE_TEMPLATE
 
       # @rbs (?log_level: Symbol, ?raises: bool) -> void
       def initialize(log_level: nil, raises: false)
@@ -109,16 +118,11 @@ module RBS
 
       # @rbs (String) -> bool
       def ignore_path?(path)
-        # steep:ignore:start
-        bundle_path = Bundler.bundle_path.to_s
-        # steep:ignore:end
-        ruby_lib_path = RbConfig::CONFIG["rubylibdir"]
-
-        path.start_with?("<internal") ||
-          path.start_with?("(eval") ||
-          path.start_with?("inline template") ||
-          path.start_with?(bundle_path) ||
-          path.start_with?(ruby_lib_path) ||
+        path.start_with?(PATH_INTERNAL) ||
+          path.start_with?(PATH_EVAL) ||
+          path.start_with?(PATH_INLINE_TEMPLATE) ||
+          path.start_with?(BUNDLE_PATH) ||
+          path.start_with?(RUBY_LIB_PATH) ||
           path.start_with?(__FILE__)
       end
 
