@@ -30,3 +30,7 @@ Layout/LeadingCommentSpace:
 
 Style/AccessorGrouping:
   Enabled: false
+
+RSpec/DescribeClass:
+  Exclude:
+    - "spec/smoke_spec.rb"
