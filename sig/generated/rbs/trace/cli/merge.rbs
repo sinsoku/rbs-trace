@@ -1,0 +1,22 @@
+# Generated from lib/rbs/trace/cli/merge.rb with RBS::Inline
+
+module RBS
+  module Trace
+    class CLI
+      class Merge
+        BANNER: ::String
+
+        # @rbs (Array[String]) -> void
+        def run: (Array[String]) -> void
+
+        private
+
+        # @rbs (String) -> Environment
+        def load_env: (String) -> Environment
+
+        # @rbs (Array[Environment]) -> Environment
+        def merge_envs: (Array[Environment]) -> Environment
+      end
+    end
+  end
+end
