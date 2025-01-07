@@ -83,7 +83,7 @@ module RBS
 
         case tp.event
         when :call
-          call_event(tp)
+          call_event(tp, member)
         when :return
           return_event(tp, member)
         end
@@ -92,13 +92,16 @@ module RBS
         raise(e) if @raises
       end
 
-      # @rbs (TracePoint) -> void
-      def call_event(tp)
+      # @rbs (TracePoint, AST::Members::MethodDefinition) -> void
+      def call_event(tp, member)
         # steep:ignore:start
+        void = member.overloads.all? { |overload| overload.method_type.type.return_type.is_a?(Types::Bases::Void) } &&
+               !assign_return_value?(tp.path, tp.method_id)
+
         builder.method_call(
           bind: tp.binding,
           parameters: tp.parameters,
-          void: !assign_return_value?(tp.path, tp.method_id)
+          void:
         )
         # steep:ignore:end
       end

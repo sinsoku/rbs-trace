@@ -53,8 +53,8 @@ module RBS
       # @rbs (TracePoint) -> void
       def record: (TracePoint) -> void
 
-      # @rbs (TracePoint) -> void
-      def call_event: (TracePoint) -> void
+      # @rbs (TracePoint, AST::Members::MethodDefinition) -> void
+      def call_event: (TracePoint, AST::Members::MethodDefinition) -> void
 
       # @rbs (TracePoint, AST::Members::MethodDefinition) -> void
       def return_event: (TracePoint, AST::Members::MethodDefinition) -> void
