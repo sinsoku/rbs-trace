@@ -1,0 +1,19 @@
+# Generated from lib/rbs/trace/cli/inline.rb with RBS::Inline
+
+module RBS
+  module Trace
+    class CLI
+      class Inline
+        BANNER: ::String
+
+        # @rbs (Array[String]) -> void
+        def run: (Array[String]) -> void
+
+        private
+
+        # @rbs (String) -> Environment
+        def load_env: (String) -> Environment
+      end
+    end
+  end
+end

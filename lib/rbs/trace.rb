@@ -2,11 +2,15 @@
 
 require "bundler"
 require "logger"
+require "optparse"
 require "prism"
 require "rbs"
 
 require_relative "trace/helpers"
 require_relative "trace/builder"
+require_relative "trace/cli"
+require_relative "trace/cli/inline"
+require_relative "trace/cli/merge"
 require_relative "trace/file"
 require_relative "trace/inline_comment_visitor"
 require_relative "trace/method_tracing"

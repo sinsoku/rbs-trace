@@ -1,0 +1,17 @@
+# Generated from lib/rbs/trace/cli.rb with RBS::Inline
+
+module RBS
+  module Trace
+    class CLI
+      BANNER: ::String
+
+      # @rbs (Array[String]) -> void
+      def run: (Array[String]) -> void
+
+      private
+
+      # @rbs (Symbol?) -> (singleton(Inline) | singleton(Merge))?
+      def command_class: (Symbol?) -> (singleton(Inline) | singleton(Merge))?
+    end
+  end
+end
