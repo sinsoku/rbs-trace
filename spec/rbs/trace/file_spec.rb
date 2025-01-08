@@ -74,22 +74,22 @@ RSpec.describe RBS::Trace::File do
         end
       RUBY
     end
+  end
 
-    describe "#to_rbs" do
-      it "returns RBS string" do
-        source = <<~RUBY
-          class A
-            def m
-            end
+  describe "#to_rbs" do
+    it "returns RBS string" do
+      source = <<~RUBY
+        class A
+          def m
           end
-        RUBY
-        file = trace_source(source, mod) { mod::A.new.m }
-        expect(file.to_rbs).to eq(<<~RBS)
-          class A
-            def m: () -> void
-          end
-        RBS
-      end
+        end
+      RUBY
+      file = trace_source(source, mod) { mod::A.new.m }
+      expect(file.to_rbs).to eq(<<~RBS)
+        class A
+          def m: () -> void
+        end
+      RBS
     end
   end
 
