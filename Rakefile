@@ -12,6 +12,13 @@ RuboCop::RakeTask.new
 desc "Generate rbs files"
 task :rbs_inline do
   sh "rbs-inline --output --opt-out lib"
+
+  # If the Ruby file is deleted, delete the RBS file
+  Dir.glob("sig/generated/**/*.rbs").each do |path|
+    rbs_path = Pathname(path)
+    rb_path = rbs_path.sub(%r{^sig/generated}, "lib").sub_ext(".rb")
+    rbs_path.delete unless File.exist?(rb_path)
+  end
 end
 
 desc "Run Steep"
