@@ -1,7 +1,7 @@
 # Generated from lib/rbs/trace/overload_compact.rb with RBS::Inline
 
 module RBS
-  module Trace
+  class Trace
     class OverloadCompact
       # @rbs (Array[AST::Members::MethodDefinition::Overload]) -> void
       def initialize: (Array[AST::Members::MethodDefinition::Overload]) -> void

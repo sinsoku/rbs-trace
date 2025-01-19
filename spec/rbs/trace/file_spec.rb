@@ -127,9 +127,9 @@ RSpec.describe RBS::Trace::File do
       RUBY
       load(path.to_s, mod)
 
-      tracing = RBS::Trace::MethodTracing.new
-      tracing.enable { mod::A.new.m }
-      file = tracing.files[path.to_s]
+      trace = RBS::Trace.new
+      trace.enable { mod::A.new.m }
+      file = trace.files[path.to_s]
 
       Dir.mktmpdir do |out_dir|
         file.save_rbs(out_dir)

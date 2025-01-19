@@ -37,21 +37,22 @@ class User
 end
 ```
 
-Call target methods within the `enable` method block, and call the `insert_rbs` method.
+Call target methods within the `enable` method block, and call the `save_comments` method.
 
 ```ruby
-tracing = RBS::Trace::MethodTracing.new
+trace = RBS::Trace.new
 
 # Collects the types of methods called in the block.
-tracing.enable do
+trace.enable do
   user = User.new("Nanoha", "Takamachi")
   user.say_hello
 end
 
-tracing.insert_rbs
+# Save RBS type declarations as embedded comments
+trace.save_comments
 ```
 
-Automatically inserts inline RBS definitions into the file.
+Automatically insert comments into the file.
 
 ```ruby
 class User
@@ -80,23 +81,15 @@ end
 Add the following code to `spec/support/rbs_trace.rb`.
 
 ```ruby
-return unless ENV["RBS_TRACE"]
-
 RSpec.configure do |config|
-  tracing = RBS::Trace::MethodTracing.new
+  trace = RBS::Trace.new
 
-  config.before(:suite) { tracing.enable }
+  config.before(:suite) { trace.enable }
   config.after(:suite) do
-    tracing.disable
-    tracing.insert_rbs
+    trace.disable
+    trace.save_comments
   end
 end
-```
-
-Then run RSpec with the environment variables.
-
-```console
-$ RBS_TRACE=1 bundle exec rspec
 ```
 
 ### Minitest
@@ -104,12 +97,12 @@ $ RBS_TRACE=1 bundle exec rspec
 Add the following code to `test_helper.rb`.
 
 ```ruby
-tracing = RBS::Trace::MethodTracing.new
-tracing.enable
+trace = RBS::Trace.new
+trace.enable
 
 Minitest.after_run do
-  tracing.disable
-  tracing.insert_rbs
+  trace.disable
+  trace.save_comments
 end
 ```
 
@@ -118,15 +111,15 @@ end
 ### Insert RBS declarations for specific files only
 
 ```ruby
-tracing.files.each do |path, file|
+trace.files.each do |path, file|
   file.rewrite if path.include?("app/models/")
 end
 ```
 
-### Save as RBS files
+### Save RBS declarations as files
 
 ```ruby
-tracing.save_rbs("sig/trace/")
+trace.save_files(out_dir: "sig/trace/")
 ```
 
 ### Enable debug logging

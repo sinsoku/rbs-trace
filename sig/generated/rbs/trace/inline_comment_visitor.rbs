@@ -1,7 +1,7 @@
 # Generated from lib/rbs/trace/inline_comment_visitor.rb with RBS::Inline
 
 module RBS
-  module Trace
+  class Trace
     class InlineCommentVisitor < Prism::Visitor
       # @rbs (Hash[TypeName, AST::Declarations::t], Hash[Integer, String]) -> void
       def initialize: (Hash[TypeName, AST::Declarations::t], Hash[Integer, String]) -> void

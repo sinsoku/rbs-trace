@@ -1,8 +1,79 @@
 # Generated from lib/rbs/trace.rb with RBS::Inline
 
 module RBS
-  module Trace
+  class Trace
+    # rubocop:disable Metrics/ClassLength
     class Error < StandardError
     end
+
+    ASSIGNED_NODE_TYPES: Array[Symbol]
+
+    # steep:ignore:start
+    BUNDLE_PATH: String
+
+    # steep:ignore:end
+    RUBY_LIB_PATH: String
+
+    PATH_INTERNAL: String
+
+    PATH_EVAL: String
+
+    PATH_INLINE_TEMPLATE: String
+
+    # @rbs (?log_level: Symbol, ?raises: bool) -> void
+    def initialize: (?log_level: Symbol, ?raises: bool) -> void
+
+    # @rbs [T] () { () -> T } -> T
+    def enable: [T] () { () -> T } -> T
+
+    # @rbs () -> void
+    def disable: () -> void
+
+    # @rbs () -> Hash[String, File]
+    def files: () -> Hash[String, File]
+
+    # @rbs () -> void
+    def save_comments: () -> void
+
+    # @rbs (out_dir: String) -> void
+    def save_files: (out_dir: String) -> void
+
+    private
+
+    # @rbs () -> TracePoint
+    def trace: () -> TracePoint
+
+    # @rbs () -> Logger
+    def logger: () -> Logger
+
+    # @rbs () -> Builder
+    def builder: () -> Builder
+
+    # @rbs (String) -> File
+    def find_or_new_file: (String) -> File
+
+    # @rbs (TracePoint) -> void
+    def record: (TracePoint) -> void
+
+    # @rbs (TracePoint, AST::Members::MethodDefinition) -> void
+    def call_event: (TracePoint, AST::Members::MethodDefinition) -> void
+
+    # @rbs (TracePoint, AST::Members::MethodDefinition) -> void
+    def return_event: (TracePoint, AST::Members::MethodDefinition) -> void
+
+    # @rbs (BasicObject) -> Class
+    def obj_to_class: (BasicObject) -> Class
+
+    # @rbs (String) -> bool
+    def ignore_path?: (String) -> bool
+
+    # @rbs (String, Symbol) -> bool
+    def assign_return_value?: (String, Symbol) -> bool
+
+    # @rbs (Prism::Node, method_name: Symbol, lineno: Integer, ?parents: Array[Prism::Node]) -> Array[Prism::Node]?
+    def find_parents: (Prism::Node, method_name: Symbol, lineno: Integer, ?parents: Array[Prism::Node]) -> Array[Prism::Node]?
+
+    # @rbs (String) -> Prism::ProgramNode?
+    def parsed_nodes: (String) -> Prism::ProgramNode?
   end
 end

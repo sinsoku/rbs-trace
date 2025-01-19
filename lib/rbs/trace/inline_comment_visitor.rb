@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RBS
-  module Trace
+  class Trace
     class InlineCommentVisitor < Prism::Visitor
       # @rbs (Hash[TypeName, AST::Declarations::t], Hash[Integer, String]) -> void
       def initialize(decls, comments)

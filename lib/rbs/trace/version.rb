@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RBS
-  module Trace
+  class Trace
     VERSION = "0.3.2"
   end
 end

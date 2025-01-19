@@ -1,7 +1,7 @@
 # Generated from lib/rbs/trace/cli.rb with RBS::Inline
 
 module RBS
-  module Trace
+  class Trace
     class CLI
       BANNER: ::String
 

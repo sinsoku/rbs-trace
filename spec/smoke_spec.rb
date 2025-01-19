@@ -42,13 +42,13 @@ RSpec.describe "Smoke Tests" do
         YAML
         File.open("test/test_helper.rb", "a") do |f|
           f.write(<<~RUBY)
-            tracing = RBS::Trace::MethodTracing.new(log_level: :debug, raises: true)
-            tracing.enable
+            trace = RBS::Trace.new(log_level: :debug, raises: true)
+            trace.enable
 
             Minitest.after_run do
-              tracing.disable
-              tracing.insert_rbs
-              tracing.save_rbs("sig/trace/")
+              trace.disable
+              trace.save_comments
+              trace.save_files(out_dir: "sig/trace/")
             end
           RUBY
         end
@@ -82,13 +82,13 @@ RSpec.describe "Smoke Tests" do
         File.open("spec/rails_helper.rb", "a") do |f|
           f.write(<<~RUBY)
             RSpec.configure do |config|
-              tracing = RBS::Trace::MethodTracing.new(log_level: :debug, raises: true)
+              trace = RBS::Trace.new(log_level: :debug, raises: true)
 
-              config.before(:suite) { tracing.enable }
+              config.before(:suite) { trace.enable }
               config.after(:suite) do
-                tracing.disable
-                tracing.insert_rbs
-                tracing.save_rbs("sig/trace/")
+                trace.disable
+                trace.save_comments
+                trace.save_files(out_dir: "sig/trace/")
               end
             end
           RUBY

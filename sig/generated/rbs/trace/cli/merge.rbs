@@ -1,7 +1,7 @@
 # Generated from lib/rbs/trace/cli/merge.rb with RBS::Inline
 
 module RBS
-  module Trace
+  class Trace
     class CLI
       class Merge
         BANNER: ::String

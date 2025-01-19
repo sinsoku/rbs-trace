@@ -1,7 +1,7 @@
 # Generated from lib/rbs/trace/helpers.rb with RBS::Inline
 
 module RBS
-  module Trace
+  class Trace
     module Helpers
       UNBOUND_CLASS_METHOD: untyped
 

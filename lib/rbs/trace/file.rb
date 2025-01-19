@@ -3,7 +3,7 @@
 require "stringio"
 
 module RBS
-  module Trace
+  class Trace
     class File
       include Helpers
 

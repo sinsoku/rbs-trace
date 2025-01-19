@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RBS
-  module Trace
+  class Trace
     module Helpers
       UNBOUND_CLASS_METHOD = Object.instance_method(:class)
       private_constant :UNBOUND_CLASS_METHOD

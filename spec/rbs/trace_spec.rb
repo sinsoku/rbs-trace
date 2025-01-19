@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe RBS::Trace::MethodTracing do
+RSpec.describe RBS::Trace do
   let(:mod) { Module.new }
 
   it "supports instance methods without arguments" do
@@ -293,9 +293,9 @@ RSpec.describe RBS::Trace::MethodTracing do
     end
     load(tf.path, mod)
 
-    tracing = described_class.new
-    tracing.enable { mod::A.new.m }
-    expect(tracing.files).to be_empty
+    trace = described_class.new
+    trace.enable { mod::A.new.m }
+    expect(trace.files).to be_empty
   end
 
   it "supports anonymous arguments" do
