@@ -121,12 +121,14 @@ module RBS
 
       # @rbs (String) -> bool
       def ignore_path?(path)
-        path.start_with?(PATH_INTERNAL) ||
-          path.start_with?(PATH_EVAL) ||
-          path.start_with?(PATH_INLINE_TEMPLATE) ||
-          path.start_with?(BUNDLE_PATH) ||
-          path.start_with?(RUBY_LIB_PATH) ||
-          path.start_with?(__FILE__)
+        path.start_with?(
+          PATH_INTERNAL,
+          PATH_EVAL,
+          PATH_INLINE_TEMPLATE,
+          BUNDLE_PATH,
+          RUBY_LIB_PATH,
+          __FILE__
+        )
       end
 
       # @rbs (String, Symbol) -> bool
