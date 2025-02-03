@@ -9,13 +9,15 @@ module RBS
         # @rbs (Array[String]) -> void
         def run: (Array[String]) -> void
 
+        # @rbs (Array[Environment]) -> Environment
+        def merge_envs: (Array[Environment]) -> Environment
+
         private
 
         # @rbs (String) -> Environment
         def load_env: (String) -> Environment
 
-        # @rbs (Array[Environment]) -> Environment
-        def merge_envs: (Array[Environment]) -> Environment
+        def merge: (untyped decl, untyped member) -> untyped
       end
     end
   end

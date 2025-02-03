@@ -25,6 +25,9 @@ Naming/FileName:
   Exclude:
     - "lib/rbs-trace.rb"
 
+Naming/VariableNumber:
+  Enabled: false
+
 Layout/LeadingCommentSpace:
   Enabled: false
 
