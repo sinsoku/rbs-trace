@@ -38,6 +38,25 @@ module RBS
           end
         end
 
+        # @rbs (Array[Environment]) -> Environment
+        def merge_envs(others) # rubocop:disable Metrics
+          Environment.new.tap do |env|
+            others.each do |other|
+              other.declarations.each do |decl|
+                next unless decl.is_a?(AST::Declarations::Class) || decl.is_a?(AST::Declarations::Module)
+
+                entry = env.module_class_entry(decl.name.absolute!)
+
+                if entry.is_a?(Environment::MultiEntry)
+                  decl.members.each { |member| merge(entry.primary.decl, member) }
+                else
+                  env << decl
+                end
+              end
+            end
+          end
+        end
+
         private
 
         # @rbs (String) -> Environment
@@ -49,14 +68,28 @@ module RBS
           end
         end
 
-        # @rbs (Array[Environment]) -> Environment
-        def merge_envs(others)
-          Environment.new.tap do |env|
-            others.each do |other|
-              other.declarations.each do |decl|
-                env << decl
-              end
+        def merge(decl, member) # rubocop:disable Metrics
+          case member
+          when AST::Declarations::Class, AST::Declarations::Module
+            d = decl.members.find { |m| m.is_a?(member.class) && m.name == member.name }
+
+            if d
+              member.members.each { |m| merge(d, m) }
+            else
+              decl.members << member
             end
+          when AST::Members::MethodDefinition
+            found = decl.members.find { |m| m.is_a?(member.class) && m.name == member.name }
+
+            if found
+              (member.overloads - found.overloads).each do |overload|
+                found.overloads << overload
+              end
+            else
+              decl.members << member
+            end
+          else
+            decl.members << member unless decl.members.include?(member)
           end
         end
       end
