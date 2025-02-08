@@ -145,8 +145,7 @@ module RBS
 
     # @rbs (String, Symbol) -> bool
     def assign_return_value?(path, method_id) # rubocop:disable Metrics
-      is_initialize = method_id == :initialize
-      return false if is_initialize
+      return false if method_id == :initialize
 
       locations = caller_locations || []
       i = locations.index { |loc| loc.path == path && loc.label == method_id.to_s }
@@ -157,8 +156,7 @@ module RBS
       node = parsed_nodes(loc.path) # steep:ignore ArgumentTypeMismatch
       return false unless node
 
-      method_name = is_initialize ? :new : method_id
-      parents = find_parents(node, method_name:, lineno: loc.lineno)
+      parents = find_parents(node, method_name: method_id, lineno: loc.lineno)
       return false unless parents
 
       parent = parents[1]
