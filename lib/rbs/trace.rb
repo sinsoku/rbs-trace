@@ -131,11 +131,6 @@ module RBS
       member.overloads << overload
     end
 
-    # @rbs (BasicObject) -> Class
-    def obj_to_class(obj)
-      Object.instance_method(:class).bind_call(obj)
-    end
-
     # @rbs (String) -> bool
     def ignore_path?(path)
       path.start_with?(
