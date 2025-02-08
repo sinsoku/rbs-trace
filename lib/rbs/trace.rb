@@ -66,7 +66,7 @@ module RBS
 
     # @rbs () -> TracePoint
     def trace
-      @trace ||= TracePoint.new(:call, :return) { |tp| record(tp) }
+      @trace ||= TracePoint.new(:call, :return) { |tp| record(tp, caller_locations&.at(1)) }
     end
 
     # @rbs () -> Logger
@@ -84,8 +84,8 @@ module RBS
       files[path] ||= File.new(path)
     end
 
-    # @rbs (TracePoint) -> void
-    def record(tp) # rubocop:disable Metrics/MethodLength
+    # @rbs (TracePoint, Thread::Backtrace::Location?) -> void
+    def record(tp, caller_location) # rubocop:disable Metrics/MethodLength
       return if ignore_path?(tp.path)
 
       file = find_or_new_file(tp.path)
@@ -96,7 +96,7 @@ module RBS
 
       case tp.event
       when :call
-        call_event(tp, member)
+        call_event(tp, member, caller_location)
       when :return
         return_event(tp, member)
       end
@@ -105,11 +105,11 @@ module RBS
       raise(e) if @raises
     end
 
-    # @rbs (TracePoint, AST::Members::MethodDefinition) -> void
-    def call_event(tp, member)
+    # @rbs (TracePoint, AST::Members::MethodDefinition, Thread::Backtrace::Location?) -> void
+    def call_event(tp, member, caller_location)
       # steep:ignore:start
       void = member.overloads.all? { |overload| overload.method_type.type.return_type.is_a?(Types::Bases::Void) } &&
-             void_return_type?(tp.path, tp.method_id)
+             void_return_type?(caller_location, tp.method_id)
 
       builder.method_call(
         bind: tp.binding,
@@ -139,28 +139,20 @@ module RBS
       )
     end
 
-    # @rbs (String, Symbol) -> bool
-    def void_return_type?(path, method_id)
+    # @rbs (Thread::Backtrace::Location?, Symbol) -> bool
+    def void_return_type?(caller_location, method_id)
       return true if method_id == :initialize
 
-      loc = find_caller_location(path, method_id.to_s)
       # If the caller is not found, assume the return value is used.
-      return false unless loc
+      return false unless caller_location
 
-      caller_path = loc.path.to_s
+      caller_path = caller_location.path.to_s
       # Returns true if the file does not exist (eval, etc.)
       return true unless ::File.exist?(caller_path)
 
       @return_value_visitors ||= {} #: Hash[String, ReturnValueVisitor]
       v = @return_value_visitors.fetch(caller_path) { ReturnValueVisitor.parse_file(caller_path) }
-      v.void_type?(loc.lineno, method_id)
-    end
-
-    # @rbs (String, String) -> Thread::Backtrace::Location?
-    def find_caller_location(path, label)
-      locations = caller_locations || []
-      i = locations.index { |loc| loc.path == path && loc.label == label }
-      locations[i + 1] if i
+      v.void_type?(caller_location.lineno, method_id)
     end
   end
 end

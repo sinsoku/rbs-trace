@@ -49,11 +49,11 @@ module RBS
     # @rbs (String) -> File
     def find_or_new_file: (String) -> File
 
-    # @rbs (TracePoint) -> void
-    def record: (TracePoint) -> void
+    # @rbs (TracePoint, Thread::Backtrace::Location?) -> void
+    def record: (TracePoint, Thread::Backtrace::Location?) -> void
 
-    # @rbs (TracePoint, AST::Members::MethodDefinition) -> void
-    def call_event: (TracePoint, AST::Members::MethodDefinition) -> void
+    # @rbs (TracePoint, AST::Members::MethodDefinition, Thread::Backtrace::Location?) -> void
+    def call_event: (TracePoint, AST::Members::MethodDefinition, Thread::Backtrace::Location?) -> void
 
     # @rbs (TracePoint, AST::Members::MethodDefinition) -> void
     def return_event: (TracePoint, AST::Members::MethodDefinition) -> void
@@ -61,10 +61,7 @@ module RBS
     # @rbs (String) -> bool
     def ignore_path?: (String) -> bool
 
-    # @rbs (String, Symbol) -> bool
-    def void_return_type?: (String, Symbol) -> bool
-
-    # @rbs (String, String) -> Thread::Backtrace::Location?
-    def find_caller_location: (String, String) -> Thread::Backtrace::Location?
+    # @rbs (Thread::Backtrace::Location?, Symbol) -> bool
+    def void_return_type?: (Thread::Backtrace::Location?, Symbol) -> bool
   end
 end
