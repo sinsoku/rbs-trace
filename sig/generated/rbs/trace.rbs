@@ -2,11 +2,8 @@
 
 module RBS
   class Trace
-    # rubocop:disable Metrics/ClassLength
     class Error < StandardError
     end
-
-    ASSIGNED_NODE_TYPES: Array[Symbol]
 
     # steep:ignore:start
     BUNDLE_PATH: String
@@ -66,11 +63,5 @@ module RBS
 
     # @rbs (String, Symbol) -> bool
     def assign_return_value?: (String, Symbol) -> bool
-
-    # @rbs (Prism::Node, method_name: Symbol, lineno: Integer, ?parents: Array[Prism::Node]) -> Array[Prism::Node]?
-    def find_parents: (Prism::Node, method_name: Symbol, lineno: Integer, ?parents: Array[Prism::Node]) -> Array[Prism::Node]?
-
-    # @rbs (String) -> Prism::ProgramNode?
-    def parsed_nodes: (String) -> Prism::ProgramNode?
   end
 end

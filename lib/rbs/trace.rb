@@ -14,15 +14,12 @@ require_relative "trace/cli/merge"
 require_relative "trace/file"
 require_relative "trace/inline_comment_visitor"
 require_relative "trace/overload_compact"
+require_relative "trace/return_value_visitor"
 require_relative "trace/version"
 
 module RBS
-  class Trace # rubocop:disable Metrics/ClassLength
+  class Trace
     class Error < StandardError; end
-
-    ASSIGNED_NODE_TYPES = %i[statements_node local_variable_write_node instance_variable_write_node
-                             class_variable_write_node constant_write_node call_node
-                             embedded_statements_node].freeze #: Array[Symbol]
     # steep:ignore:start
     BUNDLE_PATH = Bundler.bundle_path.to_s #: String
     # steep:ignore:end
@@ -31,8 +28,7 @@ module RBS
     PATH_EVAL = "(eval" #: String
     PATH_INLINE_TEMPLATE = "inline template" #: String
 
-    private_constant :ASSIGNED_NODE_TYPES, :BUNDLE_PATH, :RUBY_LIB_PATH, :PATH_INTERNAL, :PATH_EVAL,
-                     :PATH_INLINE_TEMPLATE
+    private_constant :BUNDLE_PATH, :RUBY_LIB_PATH, :PATH_INTERNAL, :PATH_EVAL, :PATH_INLINE_TEMPLATE
 
     # @rbs (?log_level: Symbol, ?raises: bool) -> void
     def initialize(log_level: nil, raises: false)
@@ -153,35 +149,13 @@ module RBS
       # If the caller is not found, assume the return value is used.
       return true unless loc
 
-      node = parsed_nodes(loc.path) # steep:ignore ArgumentTypeMismatch
-      return false unless node
+      path = loc.path.to_s
+      # If the file does not exist, it cannot be parsed and returns false.
+      return false unless ::File.exist?(path)
 
-      parents = find_parents(node, method_name: method_id, lineno: loc.lineno)
-      return false unless parents
-
-      parent = parents[1]
-      ASSIGNED_NODE_TYPES.include?(parent.type) # steep:ignore NoMethod
-    end
-
-    # @rbs (Prism::Node, method_name: Symbol, lineno: Integer, ?parents: Array[Prism::Node]) -> Array[Prism::Node]?
-    def find_parents(node, method_name:, lineno:, parents: [])
-      result = nil
-      node.compact_child_nodes.each do |child| # steep:ignore NoMethod
-        break if result
-
-        found = child.type == :call_node && child.name == method_name && child.location.start_line == lineno
-        result = found ? [child, *parents] : find_parents(child, method_name:, lineno:, parents: [node, *parents])
-      end
-      result
-    end
-
-    # @rbs (String) -> Prism::ProgramNode?
-    def parsed_nodes(path)
-      return unless ::File.exist?(path)
-
-      @parsed_nodes ||= {} #: Hash[String, Prism::ParseResult]
-      @parsed_nodes[path] ||= Prism.parse_file(path)
-      @parsed_nodes[path].value
+      @return_value_visitors ||= {} #: Hash[String, ReturnValueVisitor]
+      v = @return_value_visitors.fetch(path) { ReturnValueVisitor.parse_file(path) }
+      !v.void_type?(loc.lineno, method_id)
     end
   end
 end

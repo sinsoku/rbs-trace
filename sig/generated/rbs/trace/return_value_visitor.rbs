@@ -1,0 +1,27 @@
+# Generated from lib/rbs/trace/return_value_visitor.rb with RBS::Inline
+
+module RBS
+  class Trace
+    class ReturnValueVisitor < Prism::BasicVisitor
+      # @rbs (String) -> ReturnValueVisitor
+      def self.parse_file: (String) -> ReturnValueVisitor
+
+      # @rbs () -> void
+      def initialize: () -> void
+
+      # @rbs (Integer, Symbol) -> bool
+      def void_type?: (Integer, Symbol) -> bool
+
+      # @rbs (Prism::Node) -> void
+      def visit_child_nodes: (Prism::Node) -> void
+
+      # @rbs (Prism::CallNode) -> void
+      def visit_call_node: (Prism::CallNode) -> void
+
+      private
+
+      # @rbs (Prism::CallNode) -> bool
+      def use_return_value?: (Prism::CallNode) -> bool
+    end
+  end
+end
