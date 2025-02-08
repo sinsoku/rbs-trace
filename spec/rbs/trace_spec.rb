@@ -353,7 +353,7 @@ RSpec.describe RBS::Trace do
     RUBY
   end
 
-  it "supports eval, but the retrun value is always void" do
+  it "supports eval, but the return value is always void" do
     source = <<~RUBY
       class A
         def m
