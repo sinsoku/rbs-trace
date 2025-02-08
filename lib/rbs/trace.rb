@@ -109,7 +109,7 @@ module RBS
     def call_event(tp, member)
       # steep:ignore:start
       void = member.overloads.all? { |overload| overload.method_type.type.return_type.is_a?(Types::Bases::Void) } &&
-             !assign_return_value?(tp.path, tp.method_id)
+             void_return_type?(tp.path, tp.method_id)
 
       builder.method_call(
         bind: tp.binding,
@@ -140,22 +140,27 @@ module RBS
     end
 
     # @rbs (String, Symbol) -> bool
-    def assign_return_value?(path, method_id) # rubocop:disable Metrics
-      return false if method_id == :initialize
+    def void_return_type?(path, method_id)
+      return true if method_id == :initialize
 
-      locations = caller_locations || []
-      i = locations.index { |loc| loc.path == path && loc.label == method_id.to_s }
-      loc = locations[i + 1] if i
+      loc = find_caller_location(path, method_id.to_s)
       # If the caller is not found, assume the return value is used.
-      return true unless loc
+      return false unless loc
 
-      path = loc.path.to_s
-      # If the file does not exist, it cannot be parsed and returns false.
-      return false unless ::File.exist?(path)
+      caller_path = loc.path.to_s
+      # Returns true if the file does not exist (eval, etc.)
+      return true unless ::File.exist?(caller_path)
 
       @return_value_visitors ||= {} #: Hash[String, ReturnValueVisitor]
-      v = @return_value_visitors.fetch(path) { ReturnValueVisitor.parse_file(path) }
-      !v.void_type?(loc.lineno, method_id)
+      v = @return_value_visitors.fetch(caller_path) { ReturnValueVisitor.parse_file(caller_path) }
+      v.void_type?(loc.lineno, method_id)
+    end
+
+    # @rbs (String, String) -> Thread::Backtrace::Location?
+    def find_caller_location(path, label)
+      locations = caller_locations || []
+      i = locations.index { |loc| loc.path == path && loc.label == label }
+      locations[i + 1] if i
     end
   end
 end

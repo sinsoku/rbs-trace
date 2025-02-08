@@ -62,6 +62,9 @@ module RBS
     def ignore_path?: (String) -> bool
 
     # @rbs (String, Symbol) -> bool
-    def assign_return_value?: (String, Symbol) -> bool
+    def void_return_type?: (String, Symbol) -> bool
+
+    # @rbs (String, String) -> Thread::Backtrace::Location?
+    def find_caller_location: (String, String) -> Thread::Backtrace::Location?
   end
 end
