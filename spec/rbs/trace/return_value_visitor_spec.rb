@@ -5,7 +5,6 @@ require "stringio"
 RSpec.describe RBS::Trace::ReturnValueVisitor do
   describe ".parse_file" do
     def parse_file(source)
-      puts(source)
       tf = Tempfile.open do |fp|
         fp.write(source)
         fp
