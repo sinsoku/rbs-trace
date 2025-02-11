@@ -3,16 +3,15 @@
 require "tempfile"
 
 module TraceHelper
-  def trace_source(source, mod, &)
+  # @rbs (String) -> Module
+  def load_source(source)
     tf = Tempfile.open(["", ".rb"]) do |fp|
       fp.write(source)
       fp
     end
+    mod = Module.new
     load(tf.path, mod)
-
-    trace = RBS::Trace.new(log_level: :debug, raises: true)
-    trace.enable(&)
-    trace.files[tf.path]
+    mod
   end
 end
 

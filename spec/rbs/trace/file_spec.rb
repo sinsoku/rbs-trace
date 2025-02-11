@@ -3,17 +3,19 @@
 require "stringio"
 
 RSpec.describe RBS::Trace::File do
-  let(:mod) { Module.new }
+  let(:trace) { RBS::Trace.new(log_level: :debug, raises: true) }
 
   describe "#with_rbs" do
     it "inserts a comment" do
-      source = <<~RUBY
+      mod = load_source(<<~RUBY)
         class A
           def m
           end
         end
       RUBY
-      file = trace_source(source, mod) { mod::A.new.m }
+      trace.enable { mod::A.new.m }
+      file = trace.files.values.first
+
       expect(file.with_rbs).to eq(<<~RUBY)
         class A
           # @rbs () -> void
@@ -24,14 +26,16 @@ RSpec.describe RBS::Trace::File do
     end
 
     it "does not insert a comment if there is a `@rbs` comment" do
-      source = <<~RUBY
+      mod = load_source(<<~RUBY)
         class A
           # @rbs (Integer) -> void
           def m(x)
           end
         end
       RUBY
-      file = trace_source(source, mod) { mod::A.new.m("a") }
+      trace.enable { mod::A.new.m("a") }
+      file = trace.files.values.first
+
       expect(file.with_rbs).to eq(<<~RUBY)
         class A
           # @rbs (Integer) -> void
@@ -42,14 +46,16 @@ RSpec.describe RBS::Trace::File do
     end
 
     it "does not insert a comment if there is a `#:` comment" do
-      source = <<~RUBY
+      mod = load_source(<<~RUBY)
         class A
           #: (Integer) -> void
           def m(x)
           end
         end
       RUBY
-      file = trace_source(source, mod) { mod::A.new.m("a") }
+      trace.enable { mod::A.new.m("a") }
+      file = trace.files.values.first
+
       expect(file.with_rbs).to eq(<<~RUBY)
         class A
           #: (Integer) -> void
@@ -60,13 +66,15 @@ RSpec.describe RBS::Trace::File do
     end
 
     it "does not insert a comment if there is an inline comment using `#:`" do
-      source = <<~RUBY
+      mod = load_source(<<~RUBY)
         class A
           def m #: void
           end
         end
       RUBY
-      file = trace_source(source, mod) { mod::A.new.m }
+      trace.enable { mod::A.new.m }
+      file = trace.files.values.first
+
       expect(file.with_rbs).to eq(<<~RUBY)
         class A
           def m #: void
@@ -78,13 +86,15 @@ RSpec.describe RBS::Trace::File do
 
   describe "#to_rbs" do
     it "returns RBS string" do
-      source = <<~RUBY
+      mod = load_source(<<~RUBY)
         class A
           def m
           end
         end
       RUBY
-      file = trace_source(source, mod) { mod::A.new.m }
+      trace.enable { mod::A.new.m }
+      file = trace.files.values.first
+
       expect(file.to_rbs).to eq(<<~RBS)
         class A
           def m: () -> void
@@ -96,13 +106,14 @@ RSpec.describe RBS::Trace::File do
   describe "#save_rbs" do
     context "when path is absolute" do
       it "saves RBS files" do
-        source = <<~RUBY
+        mod = load_source(<<~RUBY)
           class A
             def m
             end
           end
         RUBY
-        file = trace_source(source, mod) { mod::A.new.m }
+        trace.enable { mod::A.new.m }
+        file = trace.files.values.first
 
         Dir.mktmpdir do |out_dir|
           file.save_rbs(out_dir)
@@ -118,6 +129,7 @@ RSpec.describe RBS::Trace::File do
     end
 
     it "when path is relative" do # rubocop:disable RSpec/ExampleLength
+      mod = Module.new
       path = Pathname("lib/app.rb")
       path.write(<<~RUBY)
         class A
@@ -127,7 +139,6 @@ RSpec.describe RBS::Trace::File do
       RUBY
       load(path.to_s, mod)
 
-      trace = RBS::Trace.new
       trace.enable { mod::A.new.m }
       file = trace.files[path.to_s]
 
