@@ -175,7 +175,7 @@ RSpec.describe RBS::Trace do
       end
     end
 
-    it "supports methods that call methods that raise exceptions" do # rubocop:disable RSpec/ExampleLength
+    it "supports methods that call methods that raise exceptions" do
       source = <<~RUBY
         class A
           def m(x)

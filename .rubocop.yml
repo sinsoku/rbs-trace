@@ -16,7 +16,7 @@ Style/Documentation:
   Enabled: false
 
 RSpec/ExampleLength:
-  Max: 25
+  Max: 50
 
 Naming/MethodParameterName:
   Enabled: false
