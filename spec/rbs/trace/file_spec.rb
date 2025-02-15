@@ -7,128 +7,140 @@ RSpec.describe RBS::Trace::File do
 
   describe "#with_rbs" do
     it "inserts a comment" do
-      mod = load_source(<<~RUBY)
+      source = <<~RUBY
         class A
           def m
           end
         end
       RUBY
-      trace.enable { mod::A.new.m }
-      file = trace.files.values.first
+      load_source(source) do |mod|
+        trace.enable { mod::A.new.m }
+        file = trace.files.values.first
 
-      expect(file.with_rbs).to eq(<<~RUBY)
-        class A
-          # @rbs () -> void
-          def m
+        expect(file.with_rbs).to eq(<<~RUBY)
+          class A
+            # @rbs () -> void
+            def m
+            end
           end
-        end
-      RUBY
+        RUBY
+      end
     end
 
     it "does not insert a comment if there is a `@rbs` comment" do
-      mod = load_source(<<~RUBY)
+      source = <<~RUBY
         class A
           # @rbs (Integer) -> void
           def m(x)
           end
         end
       RUBY
-      trace.enable { mod::A.new.m("a") }
-      file = trace.files.values.first
+      load_source(source) do |mod|
+        trace.enable { mod::A.new.m("a") }
+        file = trace.files.values.first
 
-      expect(file.with_rbs).to eq(<<~RUBY)
-        class A
-          # @rbs (Integer) -> void
-          def m(x)
+        expect(file.with_rbs).to eq(<<~RUBY)
+          class A
+            # @rbs (Integer) -> void
+            def m(x)
+            end
           end
-        end
-      RUBY
+        RUBY
+      end
     end
 
     it "does not insert a comment if there is a `#:` comment" do
-      mod = load_source(<<~RUBY)
+      source = <<~RUBY
         class A
           #: (Integer) -> void
           def m(x)
           end
         end
       RUBY
-      trace.enable { mod::A.new.m("a") }
-      file = trace.files.values.first
+      load_source(source) do |mod|
+        trace.enable { mod::A.new.m("a") }
+        file = trace.files.values.first
 
-      expect(file.with_rbs).to eq(<<~RUBY)
-        class A
-          #: (Integer) -> void
-          def m(x)
+        expect(file.with_rbs).to eq(<<~RUBY)
+          class A
+            #: (Integer) -> void
+            def m(x)
+            end
           end
-        end
-      RUBY
+        RUBY
+      end
     end
 
     it "does not insert a comment if there is an inline comment using `#:`" do
-      mod = load_source(<<~RUBY)
+      source = <<~RUBY
         class A
           def m #: void
           end
         end
       RUBY
-      trace.enable { mod::A.new.m }
-      file = trace.files.values.first
+      load_source(source) do |mod|
+        trace.enable { mod::A.new.m }
+        file = trace.files.values.first
 
-      expect(file.with_rbs).to eq(<<~RUBY)
-        class A
-          def m #: void
+        expect(file.with_rbs).to eq(<<~RUBY)
+          class A
+            def m #: void
+            end
           end
-        end
-      RUBY
+        RUBY
+      end
     end
   end
 
   describe "#to_rbs" do
     it "returns RBS string" do
-      mod = load_source(<<~RUBY)
+      source = <<~RUBY
         class A
           def m
           end
         end
       RUBY
-      trace.enable { mod::A.new.m }
-      file = trace.files.values.first
+      load_source(source) do |mod|
+        trace.enable { mod::A.new.m }
+        file = trace.files.values.first
 
-      expect(file.to_rbs).to eq(<<~RBS)
-        class A
-          def m: () -> void
-        end
-      RBS
+        expect(file.to_rbs).to eq(<<~RBS)
+          class A
+            def m: () -> void
+          end
+        RBS
+      end
     end
   end
 
   describe "#save_rbs" do
     context "when path is absolute" do
       it "saves RBS files" do
-        mod = load_source(<<~RUBY)
+        source = <<~RUBY
           class A
             def m
             end
           end
         RUBY
-        trace.enable { mod::A.new.m }
-        file = trace.files.values.first
+        load_source(source) do |mod|
+          trace.enable { mod::A.new.m }
+          file = trace.files.values.first
 
-        Dir.mktmpdir do |out_dir|
-          file.save_rbs(out_dir)
+          Dir.mktmpdir do |out_dir|
+            file.save_rbs(out_dir)
 
-          rbs_files = Dir.glob("#{out_dir}/**/*.rbs")
-          expect(File.read(rbs_files[0])).to eq(<<~RBS)
-            class A
-              def m: () -> void
-            end
-          RBS
+            rbs_files = Dir.glob("#{out_dir}/**/*.rbs")
+            expect(File.read(rbs_files[0])).to eq(<<~RBS)
+              class A
+                def m: () -> void
+              end
+            RBS
+          end
         end
       end
     end
 
-    it "when path is relative" do # rubocop:disable RSpec/ExampleLength
+    it "when path is relative" do
       mod = Module.new
       path = Pathname("lib/app.rb")
       path.write(<<~RUBY)
