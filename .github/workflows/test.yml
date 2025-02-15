@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-24.04-arm
     name: Ruby ${{ matrix.ruby }}
     strategy:
+      fail-fast: false
       matrix:
         ruby:
           - '3.1'
