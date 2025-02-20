@@ -79,7 +79,7 @@ module RBS
               decl.members << member
             end
           when AST::Members::MethodDefinition
-            found = decl.members.find { |m| m.is_a?(member.class) && m.name == member.name }
+            found = decl.members.find { |m| m.is_a?(member.class) && m.name == member.name && m.kind == member.kind }
 
             if found
               (member.overloads - found.overloads).each do |overload|

@@ -146,5 +146,33 @@ RSpec.describe RBS::Trace::CLI::Merge do
         end
       end
     end
+
+    context "when a class has a singleton method with the same name" do
+      it "does not merge the two methods" do
+        Dir.mktmpdir do |dir|
+          base = Pathname(dir)
+          sig_dir = base.join("sig").tap(&:mkdir)
+          sig_dir.join("a_1.rbs").write(<<~RBS)
+            class A
+              def m: () -> void
+            end
+          RBS
+          sig_dir.join("a_2.rbs").write(<<~RBS)
+            class A
+              def self.m: (String) -> void
+            end
+          RBS
+
+          expect do
+            cli.run(["merge", "--sig-dir", "#{dir}/sig"])
+          end.to output(<<~RBS).to_stdout
+            class A
+              def m: () -> void
+              def self.m: (String) -> void
+            end
+          RBS
+        end
+      end
+    end
   end
 end
