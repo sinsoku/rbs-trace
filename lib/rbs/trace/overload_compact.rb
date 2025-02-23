@@ -72,6 +72,7 @@ module RBS
 
       # @rbs (Array[Types::t]) -> Types::t
       def merge_types(types)
+        types = compact_types(types)
         return types.first if types.one?
 
         optional = types.any?(Types::Bases::Nil)
@@ -79,6 +80,13 @@ module RBS
         type = types.one? ? types.first : Types::Union.new(types:, location: nil) #: Types::t
 
         optional ? Types::Optional.new(type:, location: nil) : type
+      end
+
+      # @rbs (Array[Types::t]) -> Array[Types::t]
+      def compact_types(types)
+        types = types.reject { |t| t.is_a?(Types::Bases::Void) } if types.any? { |t| !t.is_a?(Types::Bases::Void) }
+        types.reject! { |t| t.is_a?(Types::Bases::Any) } if types.any? { |t| !t.is_a?(Types::Bases::Any) }
+        types
       end
     end
   end

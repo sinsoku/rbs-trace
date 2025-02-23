@@ -16,6 +16,9 @@ module RBS
 
       # @rbs (Array[Types::t]) -> Types::t
       def merge_types: (Array[Types::t]) -> Types::t
+
+      # @rbs (Array[Types::t]) -> Array[Types::t]
+      def compact_types: (Array[Types::t]) -> Array[Types::t]
     end
   end
 end
