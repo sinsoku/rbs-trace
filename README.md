@@ -4,7 +4,7 @@
 
 # RBS::Trace
 
-RBS::Trace collects argument types and return value types using TracePoint, and inserts inline RBS type declarations into files.
+RBS::Trace automatically collects argument and return types and saves RBS type declarations as RBS files or comments.
 
 ## Installation
 
@@ -122,6 +122,26 @@ end
 trace.save_files(out_dir: "sig/trace/")
 ```
 
+### Parallel testing
+
+If you are using a parallel testing gem such as [parallel_tests](https://github.com/grosser/parallel_tests) or [flatware](https://github.com/briandunn/flatware), first save the type definitions in RBS files.
+
+```ruby
+trace.save_files(out_dir: "tmp/sig-#{ENV["TEST_ENV_NUMBER"]}")
+```
+
+Then use `rbs-trace merge` to merge multiple RBS files into one.
+
+```bash
+$ rbs-trace merge --sig-dir='tmp/sig-*' > sig/merged.rbs
+```
+
+Finally, insert comments using the merged RBS files.
+
+```bash
+$ rbs-trace inline --rb-dir=app --rb-dir=lib
+```
+
 ### Enable debug logging
 
 If you want to enable debug logging, specify the environment variable `RBS_TRACE_DEBUG`.
@@ -142,4 +162,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Rbs::Trace project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/sinsoku/rbs-trace/blob/main/CODE_OF_CONDUCT.md).
+Everyone interacting in the RBS::Trace project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/sinsoku/rbs-trace/blob/main/CODE_OF_CONDUCT.md).
