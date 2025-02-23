@@ -151,6 +151,9 @@ module RBS
       # Returns true if the file does not exist (eval, etc.)
       return true unless ::File.exist?(caller_path)
 
+      # If the file is not Ruby, assume the return value is used. (erb, haml, etc.)
+      return false if ::File.extname(caller_path) != ".rb"
+
       @return_value_visitors ||= {} #: Hash[String, ReturnValueVisitor]
       v = @return_value_visitors.fetch(caller_path) { ReturnValueVisitor.parse_file(caller_path) }
       v.void_type?(loc.lineno, method_id)
