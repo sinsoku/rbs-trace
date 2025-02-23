@@ -1,5 +1,31 @@
 ## [Unreleased]
 
+## [0.4.0] - 2025-02-23
+
+- feat: Implement the function to save as RBS files
+- feat: Add CLI commands to support parallel testing
+- fix: Ignore if path is "inline template"
+
+### BREAKING CHANGE
+
+- chore!: Re-design API
+
+```ruby
+# before
+tracing = RBS::Trace::MethodTracing.new
+tracing.enable do
+  # something
+end
+tracing.insert_rbs
+
+# after
+trace = RBS::Trace.new
+trace.enable do
+  # something
+end
+trace.save_comments
+```
+
 ## [0.3.2] - 2024-12-29
 
 - fix: Do not insert comments if comment `#:` exists
