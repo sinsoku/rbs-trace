@@ -174,5 +174,36 @@ RSpec.describe RBS::Trace::CLI::Merge do
         end
       end
     end
+
+    context "when a glob pattern is specified" do
+      it "merges RBS files into one" do
+        Dir.mktmpdir do |dir|
+          base = Pathname(dir)
+          sig_1 = base.join("sig_1").tap(&:mkdir)
+          sig_1.join("a.rbs").write(<<~RBS)
+            class A
+              def m: () -> void
+            end
+          RBS
+          sig_2 = base.join("sig_2").tap(&:mkdir)
+          sig_2.join("b.rbs").write(<<~RBS)
+            class B
+              def m: () -> void
+            end
+          RBS
+
+          expect do
+            cli.run(["merge", "--sig-dir", "#{dir}/sig_*"])
+          end.to output(<<~RBS).to_stdout
+            class A
+              def m: () -> void
+            end
+            class B
+              def m: () -> void
+            end
+          RBS
+        end
+      end
+    end
   end
 end

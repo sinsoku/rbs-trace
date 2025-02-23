@@ -13,6 +13,9 @@ module RBS
             # Merge RBS files in `tmp/sig-1/` and `tmp/sig-2/`.
             $ rbs-trace merge --sig-dir=tmp/sig-1 --sig-dir=tmp/sig-2
 
+            # Or you can specify a glob pattern.
+            $ rbs-trace merge --sig-dir=tmp/sig-*
+
           Options:
         USAGE
 
@@ -27,7 +30,8 @@ module RBS
           if sig_dirs.empty?
             puts opts.help
           else
-            envs = sig_dirs.map { |dir| load_env(dir) }
+            envs = sig_dirs.flat_map { |sig_dir| Dir.glob(sig_dir) }
+                           .map { |dir| load_env(dir) }
             env = merge_envs(envs)
 
             out = StringIO.new

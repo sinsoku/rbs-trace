@@ -24,24 +24,25 @@ module RBS
 
         # @rbs (Array[String]) -> void
         def run(args) # rubocop:disable Metrics
-          sig_dir = nil
-          rb_dir = nil
+          sig_dir = Pathname.pwd.join("sig").to_s
+          rb_dirs = [] #: Array[String]
 
           opts = OptionParser.new(BANNER)
           opts.on("--sig-dir DIR") { |dir| sig_dir = dir }
-          opts.on("--rb-dir DIR") { |dir| rb_dir = dir }
+          opts.on("--rb-dir DIR") { |dir| rb_dirs << dir }
           opts.parse!(args)
 
-          if sig_dir && rb_dir
+          if rb_dirs.empty?
+            puts opts.help
+          else
             env = load_env(sig_dir) # steep:ignore ArgumentTypeMismatch
             decls = env.class_decls.transform_values { |v| v.primary.decl }
 
-            Dir.glob("#{rb_dir}/**/*.rb").each do |path|
+            rb_files = rb_dirs.flat_map { |rb_dir| Dir.glob("#{rb_dir}/**/*.rb") }
+            rb_files.each do |path|
               file = File.new(path, decls)
               file.rewrite
             end
-          else
-            puts opts.help
           end
         end
 

@@ -37,3 +37,6 @@ Style/AccessorGrouping:
 RSpec/DescribeClass:
   Exclude:
     - "spec/smoke_spec.rb"
+
+RSpec/MultipleExpectations:
+  Enabled: false
