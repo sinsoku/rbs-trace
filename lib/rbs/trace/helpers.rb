@@ -3,9 +3,6 @@
 module RBS
   class Trace
     module Helpers
-      UNBOUND_CLASS_METHOD = Object.instance_method(:class)
-      private_constant :UNBOUND_CLASS_METHOD
-
       # @rbs (name: TypeName) -> AST::Declarations::Module
       def new_module_decl(name:)
         AST::Declarations::Module.new(
@@ -44,11 +41,6 @@ module RBS
           overloading: false,
           visibility: nil
         )
-      end
-
-      # @rbs (BasicObject) -> Class
-      def obj_to_class(obj)
-        UNBOUND_CLASS_METHOD.bind_call(obj)
       end
 
       # @rbs () -> Types::Bases::Void

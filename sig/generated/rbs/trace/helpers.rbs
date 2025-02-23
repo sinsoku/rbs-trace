@@ -3,8 +3,6 @@
 module RBS
   class Trace
     module Helpers
-      UNBOUND_CLASS_METHOD: untyped
-
       # @rbs (name: TypeName) -> AST::Declarations::Module
       def new_module_decl: (name: TypeName) -> AST::Declarations::Module
 
@@ -13,9 +11,6 @@ module RBS
 
       # @rbs (name: Symbol, kind: (:singleton | :instance)) -> AST::Members::MethodDefinition
       def new_method_definition: (name: Symbol, kind: :singleton | :instance) -> AST::Members::MethodDefinition
-
-      # @rbs (BasicObject) -> Class
-      def obj_to_class: (BasicObject) -> Class
 
       # @rbs () -> Types::Bases::Void
       def type_void: () -> Types::Bases::Void

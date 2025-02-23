@@ -5,10 +5,14 @@ module RBS
     class Builder
       include Helpers
 
+      UNBOUND_CLASS_METHOD: untyped
+
+      UNBOUND_NAME_METHOD: untyped
+
       GENERICS_SIZE: untyped
 
-      # @rbs (bind: Binding, parameters: Array[__todo__], void: bool) -> void
-      def method_call: (bind: Binding, parameters: Array[__todo__], void: bool) -> void
+      # @rbs (bind: Binding, parameters: Array[__todo__], void: bool) -> Array[__todo__]
+      def method_call: (bind: Binding, parameters: Array[__todo__], void: bool) -> Array[__todo__]
 
       # @rbs (__todo__) -> AST::Members::MethodDefinition::Overload
       def method_return: (__todo__) -> AST::Members::MethodDefinition::Overload
@@ -28,6 +32,9 @@ module RBS
 
       # @rbs (BasicObject) -> Types::t
       def parse_object: (BasicObject) -> Types::t
+
+      # @rbs (BasicObject) -> Class
+      def obj_to_class: (BasicObject) -> Class
     end
   end
 end

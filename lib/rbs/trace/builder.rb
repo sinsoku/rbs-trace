@@ -2,8 +2,12 @@
 
 module RBS
   class Trace
-    class Builder
+    class Builder # rubocop:disable Metrics/ClassLength
       include Helpers
+
+      UNBOUND_CLASS_METHOD = Object.instance_method(:class)
+      UNBOUND_NAME_METHOD = Class.instance_method(:name)
+      private_constant :UNBOUND_CLASS_METHOD, :UNBOUND_NAME_METHOD
 
       GENERICS_SIZE = {
         Array => 1,
@@ -12,12 +16,14 @@ module RBS
       }.freeze
       private_constant :GENERICS_SIZE
 
-      # @rbs (bind: Binding, parameters: Array[__todo__], void: bool) -> void
+      # @rbs (bind: Binding, parameters: Array[__todo__], void: bool) -> Array[__todo__]
       def method_call(bind:, parameters:, void:)
         method_type = parse_parameters(bind, parameters)
         return_type = type_void if void
 
-        stack_traces << [method_type, return_type]
+        [method_type, return_type].tap do |types|
+          stack_traces << types
+        end
       end
 
       # @rbs (__todo__) -> AST::Members::MethodDefinition::Overload
@@ -101,16 +107,17 @@ module RBS
 
       # @rbs (untyped) -> Types::t
       def parse_class(klass) # rubocop:disable Metrics/MethodLength
+        class_name = UNBOUND_NAME_METHOD.bind_call(klass)
         if [TrueClass, FalseClass].include?(klass)
           type_bool
         elsif klass == NilClass
           type_nil
-        elsif klass == Object || klass.name.nil?
+        elsif klass == Object || class_name.nil?
           type_untyped
         else
           size = GENERICS_SIZE[klass].to_i
           args = Array.new(size) { type_untyped }
-          Types::ClassInstance.new(name: TypeName.parse(klass.name), args:, location: nil)
+          Types::ClassInstance.new(name: TypeName.parse(class_name), args:, location: nil)
         end
       end
 
@@ -118,6 +125,11 @@ module RBS
       def parse_object(object)
         klass = obj_to_class(object)
         parse_class(klass)
+      end
+
+      # @rbs (BasicObject) -> Class
+      def obj_to_class(obj)
+        UNBOUND_CLASS_METHOD.bind_call(obj)
       end
     end
   end
