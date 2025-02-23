@@ -4,7 +4,7 @@ require "tempfile"
 
 module TraceHelper
   # @rbs (String) { (Module) -> void } -> void
-  def load_source(source, &block)
+  def load_source(source)
     tf = Tempfile.open(["", ".rb"]) do |fp|
       fp.write(source)
       fp
@@ -12,7 +12,7 @@ module TraceHelper
     mod = Module.new
     load(tf.path, mod)
 
-    block.call(mod)
+    yield(mod)
   end
 end
 

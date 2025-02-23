@@ -74,7 +74,7 @@ module RBS
       def merge_types(types)
         return types.first if types.one?
 
-        optional = types.any? { |type| type.is_a?(Types::Bases::Nil) }
+        optional = types.any?(Types::Bases::Nil)
         types = types.reject { |type| type.is_a?(Types::Bases::Nil) }
         type = types.one? ? types.first : Types::Union.new(types:, location: nil) #: Types::t
 

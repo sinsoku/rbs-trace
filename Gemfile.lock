@@ -31,6 +31,7 @@ GEM
     docile (1.4.1)
     drb (2.2.1)
     ffi (1.17.0)
+    ffi (1.17.0-arm64-darwin)
     fileutils (1.7.3)
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)
@@ -84,6 +85,9 @@ GEM
       unicode-display_width (>= 2.4.0, < 4.0)
     rubocop-ast (1.37.0)
       parser (>= 3.3.1.0)
+    rubocop-performance (1.23.1)
+      rubocop (>= 1.48.1, < 2.0)
+      rubocop-ast (>= 1.31.1, < 2.0)
     rubocop-rake (0.6.0)
       rubocop (~> 1.0)
     rubocop-rspec (3.3.0)
@@ -134,6 +138,7 @@ DEPENDENCIES
   rbs-trace!
   rspec
   rubocop
+  rubocop-performance
   rubocop-rake
   rubocop-rspec
   simplecov
