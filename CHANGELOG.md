@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+## [0.4.1] - 2025-02-24
+
+- fix: Ensure class names are referenced
+- fix: Prefer other types over void and untyped
+- fix: Fix process to guess return value as void
+- fix: Do not parse if the caller is not Ruby
+- chore: Auto correct with rubocop-performance
+
 ## [0.4.0] - 2025-02-23
 
 - feat: Implement the function to save as RBS files

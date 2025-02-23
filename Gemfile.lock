@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rbs-trace (0.4.0)
+    rbs-trace (0.4.1)
       prism (>= 0.3.0)
       rbs (>= 3.5.0)
 
