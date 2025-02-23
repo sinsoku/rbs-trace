@@ -21,7 +21,7 @@ RSpec.describe RBS::Trace do
 
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
-            # @rbs () -> void
+            # @rbs () -> nil
             def m
             end
           end
@@ -41,7 +41,7 @@ RSpec.describe RBS::Trace do
 
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
-            # @rbs (Integer) -> void
+            # @rbs (Integer) -> nil
             def m(x)
             end
           end
@@ -61,7 +61,7 @@ RSpec.describe RBS::Trace do
 
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
-            # @rbs (?Integer) -> void
+            # @rbs (?Integer) -> nil
             def m(x = 1)
             end
           end
@@ -81,7 +81,7 @@ RSpec.describe RBS::Trace do
 
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
-            # @rbs (*Integer) -> void
+            # @rbs (*Integer) -> nil
             def m(*x)
             end
           end
@@ -101,7 +101,7 @@ RSpec.describe RBS::Trace do
 
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
-            # @rbs (x: Integer) -> void
+            # @rbs (x: Integer) -> nil
             def m(x:)
             end
           end
@@ -121,7 +121,7 @@ RSpec.describe RBS::Trace do
 
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
-            # @rbs (?x: Integer) -> void
+            # @rbs (?x: Integer) -> nil
             def m(x: 0)
             end
           end
@@ -141,7 +141,7 @@ RSpec.describe RBS::Trace do
 
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
-            # @rbs (**Integer) -> void
+            # @rbs (**Integer) -> nil
             def m(**opts)
             end
           end
@@ -166,7 +166,7 @@ RSpec.describe RBS::Trace do
 
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
-            # @rbs () -> void
+            # @rbs () -> nil
             def m
               raise "error"
             end
@@ -196,12 +196,12 @@ RSpec.describe RBS::Trace do
 
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
-            # @rbs (Integer) -> void
+            # @rbs (Integer) -> nil
             def m(x)
               foo
             end
 
-            # @rbs () -> void
+            # @rbs () -> nil
             def foo
               raise "error"
             end
@@ -222,7 +222,7 @@ RSpec.describe RBS::Trace do
 
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
-            # @rbs () -> void
+            # @rbs () -> nil
             def self.m
             end
           end
@@ -247,7 +247,7 @@ RSpec.describe RBS::Trace do
 
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
-            # @rbs (Integer | String) -> void
+            # @rbs (Integer | String) -> nil
             def m(x)
             end
           end
@@ -297,7 +297,7 @@ RSpec.describe RBS::Trace do
 
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
-            # @rbs (Integer?) -> void
+            # @rbs (Integer?) -> nil
             def m(x)
             end
           end
@@ -317,7 +317,7 @@ RSpec.describe RBS::Trace do
 
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
-            # @rbs (nil) -> void
+            # @rbs (nil) -> nil
             def m(x)
             end
           end
@@ -350,7 +350,7 @@ RSpec.describe RBS::Trace do
 
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
-            # @rbs (*untyped, **untyped) -> void
+            # @rbs (*untyped, **untyped) -> nil
             def m(*, **, &)
             end
           end
@@ -370,7 +370,7 @@ RSpec.describe RBS::Trace do
 
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
-            # @rbs (Array[untyped], Hash[untyped, untyped], Range[untyped]) -> void
+            # @rbs (Array[untyped], Hash[untyped, untyped], Range[untyped]) -> nil
             def m(x, y, z)
             end
           end

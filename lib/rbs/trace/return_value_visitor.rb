@@ -38,7 +38,7 @@ module RBS
       # @rbs (Prism::CallNode) -> void
       def visit_call_node(node)
         key = [node.location.start_line, node.name]
-        @void_types[key] = !use_return_value?(node)
+        @void_types[key] = void?(node)
 
         visit_child_nodes(node)
       end
@@ -50,13 +50,16 @@ module RBS
       private
 
       # @rbs (Prism::CallNode) -> bool
-      def use_return_value?(_node)
-        parent_type = @parents[-1]&.type
-        next_parent_type = @parents[-2]&.type
+      def void?(node)
+        parent_node = @parents[-1]
+        next_parent_node = @parents[-2]
+        return true if parent_node.nil? || next_parent_node.nil?
 
-        parent_type.end_with?("write_node") ||
-          parent_type == :call_node ||
-          (parent_type == :statements_node && next_parent_type == :embedded_statements_node)
+        if next_parent_node.type == :program_node
+          parent_node.type == :statements_node
+        else
+          parent_node.type == :statements_node && parent_node.child_nodes[-1] != node
+        end
       end
     end
   end

@@ -21,7 +21,7 @@ module RBS
       private
 
       # @rbs (Prism::CallNode) -> bool
-      def use_return_value?: (Prism::CallNode) -> bool
+      def void?: (Prism::CallNode) -> bool
     end
   end
 end

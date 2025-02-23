@@ -19,7 +19,7 @@ RSpec.describe RBS::Trace::File do
 
         expect(file.with_rbs).to eq(<<~RUBY)
           class A
-            # @rbs () -> void
+            # @rbs () -> nil
             def m
             end
           end
@@ -30,7 +30,7 @@ RSpec.describe RBS::Trace::File do
     it "does not insert a comment if there is a `@rbs` comment" do
       source = <<~RUBY
         class A
-          # @rbs (Integer) -> void
+          # @rbs (Integer) -> nil
           def m(x)
           end
         end
@@ -41,7 +41,7 @@ RSpec.describe RBS::Trace::File do
 
         expect(file.with_rbs).to eq(<<~RUBY)
           class A
-            # @rbs (Integer) -> void
+            # @rbs (Integer) -> nil
             def m(x)
             end
           end
@@ -106,7 +106,7 @@ RSpec.describe RBS::Trace::File do
 
         expect(file.to_rbs).to eq(<<~RBS)
           class A
-            def m: () -> void
+            def m: () -> nil
           end
         RBS
       end
@@ -132,7 +132,7 @@ RSpec.describe RBS::Trace::File do
             rbs_files = Dir.glob("#{out_dir}/**/*.rbs")
             expect(File.read(rbs_files[0])).to eq(<<~RBS)
               class A
-                def m: () -> void
+                def m: () -> nil
               end
             RBS
           end
@@ -159,7 +159,7 @@ RSpec.describe RBS::Trace::File do
 
         expect(File.read("#{out_dir}/lib/app.rbs")).to eq(<<~RBS)
           class A
-            def m: () -> void
+            def m: () -> nil
           end
         RBS
       end

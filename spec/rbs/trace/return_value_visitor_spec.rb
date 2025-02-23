@@ -22,6 +22,20 @@ RSpec.describe RBS::Trace::ReturnValueVisitor do
       it { is_expected.to be_void_type(1, :foo) }
     end
 
+    context "when method calls within def_node" do
+      subject do
+        parse_file(<<~RUBY)
+          def m
+            foo
+            bar
+          end
+        RUBY
+      end
+
+      it { is_expected.to be_void_type(2, :foo) }
+      it { is_expected.not_to be_void_type(3, :bar) }
+    end
+
     context "when assignment to local variable" do
       subject do
         parse_file(<<~RUBY)
@@ -82,6 +96,26 @@ RSpec.describe RBS::Trace::ReturnValueVisitor do
       it { is_expected.not_to be_void_type(1, :foo) }
       it { is_expected.not_to be_void_type(1, :bar) }
       it { is_expected.to be_void_type(1, :buz) }
+    end
+
+    context "when an if statement" do
+      subject do
+        parse_file(<<~RUBY)
+          puts "foo" if foo
+        RUBY
+      end
+
+      it { is_expected.not_to be_void_type(1, :foo) }
+    end
+
+    context "when an unless statement" do
+      subject do
+        parse_file(<<~RUBY)
+          puts "foo" unless foo
+        RUBY
+      end
+
+      it { is_expected.not_to be_void_type(1, :foo) }
     end
   end
 end
