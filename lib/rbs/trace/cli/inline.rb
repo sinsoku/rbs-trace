@@ -13,12 +13,6 @@ module RBS
             # Insert inline comments to `app/**/*.rb`.
             $ rbs-trace inline --sig-dir=sig --rb-dir=app
 
-            # Generate RBS files with rbs-inline.
-            $ rbs-inline --output --opt-out app
-
-            # Remove method definitions that have been migrated to inline comments.
-            $ rbs subtract --write sig sig/generated/
-
           Options:
         USAGE
 
