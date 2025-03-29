@@ -24,17 +24,15 @@ module RBS
     BUNDLE_PATH = Bundler.bundle_path.to_s #: String
     # steep:ignore:end
     RUBY_LIB_PATH = RbConfig::CONFIG["rubylibdir"] #: String
-    PATH_INTERNAL = "<internal" #: String
-    PATH_EVAL = "(eval" #: String
-    PATH_INLINE_TEMPLATE = "inline template" #: String
 
-    private_constant :BUNDLE_PATH, :RUBY_LIB_PATH, :PATH_INTERNAL, :PATH_EVAL, :PATH_INLINE_TEMPLATE
+    private_constant :BUNDLE_PATH, :RUBY_LIB_PATH
 
     # @rbs (?log_level: Symbol, ?raises: bool) -> void
     def initialize(log_level: nil, raises: false)
       @log_level = log_level
       @log_level ||= ENV["RBS_TRACE_DEBUG"] ? :debug : :info
       @raises = raises
+      @trace_paths = Set.new(Dir.glob("**/*.rb").reject { |path| path.start_with?(BUNDLE_PATH, RUBY_LIB_PATH) })
     end
 
     # @rbs [T] () { () -> T } -> T
@@ -86,7 +84,7 @@ module RBS
 
     # @rbs (TracePoint) -> void
     def record(tp) # rubocop:disable Metrics/MethodLength
-      return if ignore_path?(tp.path)
+      return unless @trace_paths.include?(tp.path)
 
       file = find_or_new_file(tp.path)
       # steep:ignore:start
@@ -125,18 +123,6 @@ module RBS
       return if member.overloads.include?(overload)
 
       member.overloads << overload
-    end
-
-    # @rbs (String) -> bool
-    def ignore_path?(path)
-      path.start_with?(
-        PATH_INTERNAL,
-        PATH_EVAL,
-        PATH_INLINE_TEMPLATE,
-        BUNDLE_PATH,
-        RUBY_LIB_PATH,
-        __FILE__
-      )
     end
 
     # @rbs (String, Symbol) -> bool
