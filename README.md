@@ -111,9 +111,7 @@ end
 ### Insert RBS declarations for specific files only
 
 ```ruby
-trace.files.each do |path, file|
-  file.rewrite if path.include?("app/models/")
-end
+trace.save_comments(only: Dir.glob("#{Dir.pwd}/app/models/**/*.rb"))
 ```
 
 ### Save RBS declarations as files

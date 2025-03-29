@@ -52,9 +52,11 @@ module RBS
       @files ||= {}
     end
 
-    # @rbs () -> void
-    def save_comments
-      files.each_value(&:rewrite)
+    # @rbs (?only: Array[String]) -> void
+    def save_comments(only: [])
+      files.each do |path, file|
+        file.rewrite if only.empty? || only.include?(path)
+      end
     end
 
     # @rbs (out_dir: String) -> void

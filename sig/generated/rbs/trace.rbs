@@ -29,8 +29,8 @@ module RBS
     # @rbs () -> Hash[String, File]
     def files: () -> Hash[String, File]
 
-    # @rbs () -> void
-    def save_comments: () -> void
+    # @rbs (?only: Array[String]) -> void
+    def save_comments: (?only: Array[String]) -> void
 
     # @rbs (out_dir: String) -> void
     def save_files: (out_dir: String) -> void
