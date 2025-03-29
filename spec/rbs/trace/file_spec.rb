@@ -151,7 +151,6 @@ RSpec.describe RBS::Trace::File do
       RUBY
       load(path.to_s, mod)
 
-      trace = RBS::Trace.new(log_level: :debug, raises: true)
       trace.enable { mod::A.new.m }
       file = trace.files[path.to_s]
 

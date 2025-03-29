@@ -11,6 +11,12 @@ module RBS
     # steep:ignore:end
     RUBY_LIB_PATH: String
 
+    PATH_INTERNAL: String
+
+    PATH_EVAL: String
+
+    PATH_INLINE_TEMPLATE: String
+
     # @rbs (?log_level: Symbol, ?raises: bool) -> void
     def initialize: (?log_level: Symbol, ?raises: bool) -> void
 
@@ -51,6 +57,9 @@ module RBS
 
     # @rbs (TracePoint, AST::Members::MethodDefinition) -> void
     def return_event: (TracePoint, AST::Members::MethodDefinition) -> void
+
+    # @rbs (String) -> bool
+    def ignore_path?: (String) -> bool
 
     # @rbs (String, Symbol) -> bool
     def void_return_type?: (String, Symbol) -> bool
