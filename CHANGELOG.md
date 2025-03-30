@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.5.0] - 2025-03-30
+
+- feat: Add paths to control trace targets
+- chore: Remove wrong examples
+
 ## [0.4.1] - 2025-02-24
 
 - fix: Ensure class names are referenced
