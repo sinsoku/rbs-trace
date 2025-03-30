@@ -111,7 +111,7 @@ end
 ### Insert RBS declarations for specific files only
 
 ```ruby
-trace.save_comments(only: Dir.glob("#{Dir.pwd}/app/models/**/*.rb"))
+RBS::Trace.new(paths: Dir.glob("#{Dir.pwd}/app/models/**/*.rb"))
 ```
 
 ### Save RBS declarations as files

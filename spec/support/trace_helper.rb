@@ -5,7 +5,8 @@ require "tempfile"
 module TraceHelper
   # @rbs (String) { (Module) -> void } -> void
   def load_source(source)
-    tf = Tempfile.open(["", ".rb"]) do |fp|
+    tmpdir = File.expand_path("../../tmp", __dir__)
+    tf = Tempfile.open(["", ".rb"], tmpdir) do |fp|
       fp.write(source)
       fp
     end

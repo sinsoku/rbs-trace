@@ -142,7 +142,7 @@ RSpec.describe RBS::Trace::File do
 
     it "when path is relative" do
       mod = Module.new
-      path = Pathname("lib/app.rb")
+      path = Pathname("#{Dir.pwd}/lib/app.rb")
       path.write(<<~RUBY)
         class A
           def m
