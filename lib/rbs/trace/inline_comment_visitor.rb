@@ -15,17 +15,17 @@ module RBS
       # @rbs override
       # @rbs (Prism::Node) -> void
       def visit_class_node(node)
-        @context.push(node.name)
-        super
-        @context.pop
+        with_context node do
+          super
+        end
       end
 
       # @rbs override
       # @rbs (Prism::Node) -> void
       def visit_module_node(node)
-        @context.push(node.name)
-        super
-        @context.pop
+        with_context node do
+          super
+        end
       end
 
       # @rbs override
@@ -56,6 +56,17 @@ module RBS
 
         decl.members.find do |member|
           member.is_a?(AST::Members::MethodDefinition) && member.name == name
+        end
+      end
+
+      def with_context(node)
+        names = node.constant_path.full_name_parts
+        @context.push(*names)
+
+        yield
+
+        names.each do
+          @context.pop
         end
       end
     end
