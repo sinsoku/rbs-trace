@@ -66,9 +66,7 @@ module RBS
 
         yield
 
-        names.each do
-          @context.pop
-        end
+        @context.pop(names.size)
       end
     end
   end
