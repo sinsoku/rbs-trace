@@ -61,7 +61,10 @@ module RBS
 
       # @rbs (Prism::ModuleNode | Prism::ClassNode) { () -> void } -> void
       def with_context(node)
-        names = node.constant_path.full_name_parts
+        constant_path = node.constant_path
+        raise if constant_path.is_a?(Prism::MissingNode) || constant_path.is_a?(Prism::CallNode)
+
+        names = constant_path.full_name_parts
         @context.push(*names)
 
         yield
