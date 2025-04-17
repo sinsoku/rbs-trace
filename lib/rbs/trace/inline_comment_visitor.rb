@@ -59,6 +59,7 @@ module RBS
         end
       end
 
+      # @rbs (Prism::ModuleNode | Prism::ClassNode) { () -> void } -> void
       def with_context(node)
         names = node.constant_path.full_name_parts
         @context.push(*names)
