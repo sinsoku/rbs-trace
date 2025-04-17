@@ -59,14 +59,20 @@ module RBS
         end
       end
 
+      # @rbs (Prism::ModuleNode | Prism::ClassNode) { () -> void } -> void
       def with_context(node)
-        names = node.constant_path.full_name_parts
-        @context.push(*names)
+        constant_path = node.constant_path
 
-        yield
+        case constant_path
+        when Prism::ConstantReadNode, Prism::ConstantPathNode
+          names = constant_path.full_name_parts
+          @context.push(*names)
 
-        names.each do
-          @context.pop
+          yield
+
+          @context.pop(names.size)
+        else
+          yield
         end
       end
     end
