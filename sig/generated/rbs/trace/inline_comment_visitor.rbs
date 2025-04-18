@@ -22,6 +22,9 @@ module RBS
 
       # @rbs (Symbol) -> AST::Members::MethodDefinition?
       def find_method_definition: (Symbol) -> AST::Members::MethodDefinition?
+
+      # @rbs (Prism::ModuleNode | Prism::ClassNode) { () -> void } -> void
+      def with_context: (Prism::ModuleNode | Prism::ClassNode) { () -> void } -> void
     end
   end
 end

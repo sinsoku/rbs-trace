@@ -423,5 +423,70 @@ RSpec.describe RBS::Trace do
         RUBY
       end
     end
+
+    it "supports multiple nested modules in a single file" do
+      # also defining `class B::C` to check sanity of the stack operations
+      source = <<~RUBY
+        module A
+          module B
+          end
+
+          class B::C
+            def m = 'a'
+          end
+
+          class D
+            def n = 1
+          end
+        end
+      RUBY
+      load_source(source) do |mod|
+        trace.enable { mod::A::D.new.n }
+
+        expect(to_rbs(trace)).to eq(<<~RUBY)
+          module A
+            module B
+            end
+
+            class B::C
+              def m = 'a'
+            end
+
+            class D
+              # @rbs () -> Integer
+              def n = 1
+            end
+          end
+        RUBY
+      end
+    end
+
+    it "inline signatures will be written for methods in nested modules defined w/ ::" do
+      source = <<~RUBY
+        module A
+          module B
+          end
+        end
+
+        class A::B::C
+          def m = 1
+        end
+      RUBY
+      load_source(source) do |mod|
+        trace.enable { mod::A::B::C.new.m }
+
+        expect(to_rbs(trace)).to eq(<<~RUBY)
+          module A
+            module B
+            end
+          end
+
+          class A::B::C
+            # @rbs () -> Integer
+            def m = 1
+          end
+        RUBY
+      end
+    end
   end
 end
