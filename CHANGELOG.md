@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.5.1] - 2025-04-20
+
+- fix: Support nested modules defined with `::`
+
 ## [0.5.0] - 2025-03-30
 
 - feat: Add paths to control trace targets
