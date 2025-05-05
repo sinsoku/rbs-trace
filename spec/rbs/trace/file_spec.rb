@@ -27,6 +27,48 @@ RSpec.describe RBS::Trace::File do
       end
     end
 
+    it "supports rbs_keyword comment format" do
+      source = <<~RUBY
+        class A
+          def m
+          end
+        end
+      RUBY
+      load_source(source) do |mod|
+        trace.enable { mod::A.new.m }
+        file = trace.files.values.first
+
+        expect(file.with_rbs(:rbs_keyword)).to eq(<<~RUBY)
+          class A
+            # @rbs () -> nil
+            def m
+            end
+          end
+        RUBY
+      end
+    end
+
+    it "supports rbs_colon comment format" do
+      source = <<~RUBY
+        class A
+          def m
+          end
+        end
+      RUBY
+      load_source(source) do |mod|
+        trace.enable { mod::A.new.m }
+        file = trace.files.values.first
+
+        expect(file.with_rbs(:rbs_colon)).to eq(<<~RUBY)
+          class A
+            #: () -> nil
+            def m
+            end
+          end
+        RUBY
+      end
+    end
+
     it "does not insert a comment if there is a `@rbs` comment" do
       source = <<~RUBY
         class A

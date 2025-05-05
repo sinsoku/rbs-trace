@@ -50,10 +50,10 @@ module RBS
       @files ||= {}
     end
 
-    # @rbs () -> void
-    def save_comments
+    # @rbs (?Symbol) -> void
+    def save_comments(comment_format = nil)
       files.each do |path, file|
-        file.rewrite if @paths.include?(path)
+        file.rewrite(comment_format) if @paths.include?(path)
       end
     end
 

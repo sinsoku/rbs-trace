@@ -47,6 +47,78 @@ RSpec.describe RBS::Trace::CLI::Inline do
       end
     end
 
+    context "when `--comment-format` is specified (rbs_keyword)" do
+      it "embeds RBS into Ruby code" do
+        Dir.mktmpdir do |dir|
+          Dir.chdir(dir) do
+            base = Pathname.pwd
+            rb_dir = base.join("app").tap(&:mkdir)
+            sig_dir = base.join("sig").tap(&:mkdir)
+
+            rb_dir.join("a.rb").write(<<~RUBY)
+              class A
+                def foo
+                  puts "foo"
+                end
+              end
+            RUBY
+            sig_dir.join("a.rbs").write(<<~RBS)
+              class A
+                def foo: () -> void
+              end
+            RBS
+
+            cli.run(["inline", "--rb-dir", "app", "--comment-format", "rbs_keyword"])
+
+            expect(rb_dir.join("a.rb").read).to eq(<<~RUBY)
+              class A
+                # @rbs () -> void
+                def foo
+                  puts "foo"
+                end
+              end
+            RUBY
+          end
+        end
+      end
+    end
+
+    context "when `--comment-format` is specified (rbs_colon)" do
+      it "embeds RBS into Ruby code" do
+        Dir.mktmpdir do |dir|
+          Dir.chdir(dir) do
+            base = Pathname.pwd
+            rb_dir = base.join("app").tap(&:mkdir)
+            sig_dir = base.join("sig").tap(&:mkdir)
+
+            rb_dir.join("a.rb").write(<<~RUBY)
+              class A
+                def foo
+                  puts "foo"
+                end
+              end
+            RUBY
+            sig_dir.join("a.rbs").write(<<~RBS)
+              class A
+                def foo: () -> void
+              end
+            RBS
+
+            cli.run(["inline", "--rb-dir", "app", "--comment-format", "rbs_colon"])
+
+            expect(rb_dir.join("a.rb").read).to eq(<<~RUBY)
+              class A
+                #: () -> void
+                def foo
+                  puts "foo"
+                end
+              end
+            RUBY
+          end
+        end
+      end
+    end
+
     context "when `--sig-dir` is not specified" do
       it "embeds RBS into Ruby code" do
         Dir.mktmpdir do |dir|
