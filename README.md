@@ -114,6 +114,25 @@ end
 RBS::Trace.new(paths: Dir.glob("#{Dir.pwd}/app/models/**/*.rb"))
 ```
 
+### Change the format of embedded comments
+
+You can change the comment format.
+
+| `comment_format` | embedded comment |
+|---|---|
+| `:rbs_keyword` (default) | `# @rbs () -> void` |
+| `:rbs_colon` | `#: () -> void` |
+
+```ruby
+trace.save_comments(:rbs_colon)
+```
+
+or
+
+```bash
+$ rbs-trace inline --rb-dir=app --rb-dir=lib --comment-format=rbs_colon
+```
+
 ### Save RBS declarations as files
 
 ```ruby

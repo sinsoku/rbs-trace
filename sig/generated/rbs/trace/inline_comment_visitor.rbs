@@ -3,8 +3,8 @@
 module RBS
   class Trace
     class InlineCommentVisitor < Prism::Visitor
-      # @rbs (Hash[TypeName, AST::Declarations::t], Hash[Integer, String]) -> void
-      def initialize: (Hash[TypeName, AST::Declarations::t], Hash[Integer, String]) -> void
+      # @rbs (Hash[TypeName, AST::Declarations::t], Hash[Integer, String], Symbol?) -> void
+      def initialize: (Hash[TypeName, AST::Declarations::t], Hash[Integer, String], Symbol?) -> void
 
       # @rbs override
       # @rbs (Prism::Node) -> void

@@ -3,9 +3,9 @@
 RSpec.describe RBS::Trace do
   let(:trace) { described_class.new(log_level: :debug, raises: true) }
 
-  # @rbs (RBS::Trace) -> String
-  def to_rbs(trace)
-    trace.files.each_value.map(&:with_rbs).join
+  # @rbs (RBS::Trace, ?Symbol) -> String
+  def to_rbs(trace, comment_format = nil)
+    trace.files.each_value.map { |file| file.with_rbs(comment_format) }.join
   end
 
   describe "#enable" do
@@ -22,6 +22,22 @@ RSpec.describe RBS::Trace do
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
             # @rbs () -> nil
+            def m
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+          class A
+            # @rbs () -> nil
+            def m
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+          class A
+            #: () -> nil
             def m
             end
           end
@@ -46,6 +62,22 @@ RSpec.describe RBS::Trace do
             end
           end
         RUBY
+
+        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+          class A
+            # @rbs (Integer) -> nil
+            def m(x)
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+          class A
+            #: (Integer) -> nil
+            def m(x)
+            end
+          end
+        RUBY
       end
     end
 
@@ -62,6 +94,22 @@ RSpec.describe RBS::Trace do
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
             # @rbs (?Integer) -> nil
+            def m(x = 1)
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+          class A
+            # @rbs (?Integer) -> nil
+            def m(x = 1)
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+          class A
+            #: (?Integer) -> nil
             def m(x = 1)
             end
           end
@@ -86,6 +134,22 @@ RSpec.describe RBS::Trace do
             end
           end
         RUBY
+
+        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+          class A
+            # @rbs (*Integer) -> nil
+            def m(*x)
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+          class A
+            #: (*Integer) -> nil
+            def m(*x)
+            end
+          end
+        RUBY
       end
     end
 
@@ -102,6 +166,22 @@ RSpec.describe RBS::Trace do
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
             # @rbs (x: Integer) -> nil
+            def m(x:)
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+          class A
+            # @rbs (x: Integer) -> nil
+            def m(x:)
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+          class A
+            #: (x: Integer) -> nil
             def m(x:)
             end
           end
@@ -126,6 +206,22 @@ RSpec.describe RBS::Trace do
             end
           end
         RUBY
+
+        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+          class A
+            # @rbs (?x: Integer) -> nil
+            def m(x: 0)
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+          class A
+            #: (?x: Integer) -> nil
+            def m(x: 0)
+            end
+          end
+        RUBY
       end
     end
 
@@ -142,6 +238,22 @@ RSpec.describe RBS::Trace do
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
             # @rbs (**Integer) -> nil
+            def m(**opts)
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+          class A
+            # @rbs (**Integer) -> nil
+            def m(**opts)
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+          class A
+            #: (**Integer) -> nil
             def m(**opts)
             end
           end
@@ -167,6 +279,24 @@ RSpec.describe RBS::Trace do
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
             # @rbs () -> nil
+            def m
+              raise "error"
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+          class A
+            # @rbs () -> nil
+            def m
+              raise "error"
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+          class A
+            #: () -> nil
             def m
               raise "error"
             end
@@ -207,6 +337,34 @@ RSpec.describe RBS::Trace do
             end
           end
         RUBY
+
+        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+          class A
+            # @rbs (Integer) -> nil
+            def m(x)
+              foo
+            end
+
+            # @rbs () -> nil
+            def foo
+              raise "error"
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+          class A
+            #: (Integer) -> nil
+            def m(x)
+              foo
+            end
+
+            #: () -> nil
+            def foo
+              raise "error"
+            end
+          end
+        RUBY
       end
     end
 
@@ -223,6 +381,22 @@ RSpec.describe RBS::Trace do
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
             # @rbs () -> nil
+            def self.m
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+          class A
+            # @rbs () -> nil
+            def self.m
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+          class A
+            #: () -> nil
             def self.m
             end
           end
@@ -248,6 +422,22 @@ RSpec.describe RBS::Trace do
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
             # @rbs (Integer | String) -> nil
+            def m(x)
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+          class A
+            # @rbs (Integer | String) -> nil
+            def m(x)
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+          class A
+            #: (Integer | String) -> nil
             def m(x)
             end
           end
@@ -278,6 +468,24 @@ RSpec.describe RBS::Trace do
             end
           end
         RUBY
+
+        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+          class A
+            # @rbs (bool) -> (Integer | String)
+            def m(is_int)
+              is_int ? 1 : "a"
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+          class A
+            #: (bool) -> (Integer | String)
+            def m(is_int)
+              is_int ? 1 : "a"
+            end
+          end
+        RUBY
       end
     end
 
@@ -302,6 +510,22 @@ RSpec.describe RBS::Trace do
             end
           end
         RUBY
+
+        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+          class A
+            # @rbs (Integer?) -> nil
+            def m(x)
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+          class A
+            #: (Integer?) -> nil
+            def m(x)
+            end
+          end
+        RUBY
       end
     end
 
@@ -318,6 +542,22 @@ RSpec.describe RBS::Trace do
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
             # @rbs (nil) -> nil
+            def m(x)
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+          class A
+            # @rbs (nil) -> nil
+            def m(x)
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+          class A
+            #: (nil) -> nil
             def m(x)
             end
           end
@@ -355,6 +595,22 @@ RSpec.describe RBS::Trace do
             end
           end
         RUBY
+
+        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+          class A
+            # @rbs (*untyped, **untyped) -> nil
+            def m(*, **, &)
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+          class A
+            #: (*untyped, **untyped) -> nil
+            def m(*, **, &)
+            end
+          end
+        RUBY
       end
     end
 
@@ -371,6 +627,22 @@ RSpec.describe RBS::Trace do
         expect(to_rbs(trace)).to eq(<<~RUBY)
           class A
             # @rbs (Array[untyped], Hash[untyped, untyped], Range[untyped]) -> nil
+            def m(x, y, z)
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+          class A
+            # @rbs (Array[untyped], Hash[untyped, untyped], Range[untyped]) -> nil
+            def m(x, y, z)
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+          class A
+            #: (Array[untyped], Hash[untyped, untyped], Range[untyped]) -> nil
             def m(x, y, z)
             end
           end
@@ -399,6 +671,24 @@ RSpec.describe RBS::Trace do
             end
           end
         RUBY
+
+        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+          class A < BasicObject
+            # @rbs (#{mod}::A) -> #{mod}::A
+            def m(x)
+              A.new
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+          class A < BasicObject
+            #: (#{mod}::A) -> #{mod}::A
+            def m(x)
+              A.new
+            end
+          end
+        RUBY
       end
     end
 
@@ -421,10 +711,26 @@ RSpec.describe RBS::Trace do
             end
           end
         RUBY
+
+        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+          class A
+            # @rbs () -> void
+            def m
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+          class A
+            #: () -> void
+            def m
+            end
+          end
+        RUBY
       end
     end
 
-    it "supports multiple nested modules in a single file" do
+    it "supports multiple nested modules in a single file" do # rubocop:disable RSpec/ExampleLength
       # also defining `class B::C` to check sanity of the stack operations
       source = <<~RUBY
         module A
@@ -458,6 +764,38 @@ RSpec.describe RBS::Trace do
             end
           end
         RUBY
+
+        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+          module A
+            module B
+            end
+
+            class B::C
+              def m = 'a'
+            end
+
+            class D
+              # @rbs () -> Integer
+              def n = 1
+            end
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+          module A
+            module B
+            end
+
+            class B::C
+              def m = 'a'
+            end
+
+            class D
+              #: () -> Integer
+              def n = 1
+            end
+          end
+        RUBY
       end
     end
 
@@ -483,6 +821,30 @@ RSpec.describe RBS::Trace do
 
           class A::B::C
             # @rbs () -> Integer
+            def m = 1
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+          module A
+            module B
+            end
+          end
+
+          class A::B::C
+            # @rbs () -> Integer
+            def m = 1
+          end
+        RUBY
+
+        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+          module A
+            module B
+            end
+          end
+
+          class A::B::C
+            #: () -> Integer
             def m = 1
           end
         RUBY

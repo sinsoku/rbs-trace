@@ -27,11 +27,11 @@ module RBS
         end
       end
 
-      # @rbs () -> String
-      def with_rbs
+      # @rbs (?Symbol?) -> String
+      def with_rbs(comment_format = nil)
         result = Prism.parse_file(@path)
         comments = {} #: Hash[Integer, String]
-        result.value.accept(InlineCommentVisitor.new(@decls, comments))
+        result.value.accept(InlineCommentVisitor.new(@decls, comments, comment_format))
 
         lines = result.source.source.lines
         comments.keys.sort.reverse_each do |i|
@@ -42,9 +42,9 @@ module RBS
         lines.join
       end
 
-      # @rbs () -> void
-      def rewrite
-        ::File.write(@path, with_rbs)
+      # @rbs (?Symbol?) -> void
+      def rewrite(comment_format = nil)
+        ::File.write(@path, with_rbs(comment_format))
       end
 
       # @rbs () -> String

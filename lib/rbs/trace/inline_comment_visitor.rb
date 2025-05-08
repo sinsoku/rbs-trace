@@ -3,10 +3,11 @@
 module RBS
   class Trace
     class InlineCommentVisitor < Prism::Visitor
-      # @rbs (Hash[TypeName, AST::Declarations::t], Hash[Integer, String]) -> void
-      def initialize(decls, comments)
+      # @rbs (Hash[TypeName, AST::Declarations::t], Hash[Integer, String], Symbol?) -> void
+      def initialize(decls, comments, comment_format)
         @decls = decls
         @comments = comments
+        @comment_prefix = comment_format == :rbs_colon ? "#:" : "# @rbs"
         @context = [] #: Array[Symbol]
 
         super()
@@ -38,7 +39,7 @@ module RBS
           overloads = OverloadCompact.new(member.overloads).call
           comment = overloads.map(&:method_type).join(" | ")
 
-          @comments[lineno] = "#{indent}# @rbs #{comment}\n"
+          @comments[lineno] = "#{indent}#{@comment_prefix} #{comment}\n"
         end
 
         super

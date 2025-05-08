@@ -11,11 +11,11 @@ module RBS
       # @rbs (untyped, Class, Symbol) -> AST::Members::MethodDefinition?
       def find_or_new_method_definition: (untyped, Class, Symbol) -> AST::Members::MethodDefinition?
 
-      # @rbs () -> String
-      def with_rbs: () -> String
+      # @rbs (?Symbol?) -> String
+      def with_rbs: (?Symbol?) -> String
 
-      # @rbs () -> void
-      def rewrite: () -> void
+      # @rbs (?Symbol?) -> void
+      def rewrite: (?Symbol?) -> void
 
       # @rbs () -> String
       def to_rbs: () -> String
