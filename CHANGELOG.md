@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.6.0] - 2025-05-12
+
+- feat: Support inline comments using colon-prefixed RBS syntax
+- chore: Update gem dependencies
+
 ## [0.5.1] - 2025-04-20
 
 - fix: Support nested modules defined with `::`
