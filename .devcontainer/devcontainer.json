@@ -1,0 +1,17 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/base:1-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/ruby:1": {
+      "version": "3.4.4"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GitHub.copilot",
+        "Shopify.ruby-lsp",
+        "soutaro.steep-vscode"
+      ]
+    }
+  }
+}
