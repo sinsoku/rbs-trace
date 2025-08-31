@@ -9,13 +9,16 @@ module RBS
 
       UNBOUND_NAME_METHOD: untyped
 
-      GENERICS_SIZE: untyped
+      DEFAULT_GENERICS_SIZE: Hash[String, Integer]
 
       # @rbs (bind: Binding, parameters: Array[__todo__], void: bool) -> Array[__todo__]
       def method_call: (bind: Binding, parameters: Array[__todo__], void: bool) -> Array[__todo__]
 
       # @rbs (__todo__) -> AST::Members::MethodDefinition::Overload
       def method_return: (__todo__) -> AST::Members::MethodDefinition::Overload
+
+      # @rbs () -> Hash[String, Integer]
+      def generics_size: () -> Hash[String, Integer]
 
       private
 

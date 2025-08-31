@@ -5,6 +5,7 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in rbs-trace.gemspec
 gemspec
 
+gem "csv"
 gem "rake"
 gem "rbs-inline", require: false
 gem "rspec"

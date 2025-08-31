@@ -139,6 +139,20 @@ $ rbs-trace inline --rb-dir=app --rb-dir=lib --comment-format=rbs_colon
 trace.save_files(out_dir: "sig/trace/")
 ```
 
+### Specify generics size
+
+By default, generics are applied to the generated results only in the following classes.
+
+- Array
+- Hash
+- Range
+
+If any other classes require generics, configure them as follows.
+
+```ruby
+trace.add_generics_size!("CSV::Table" => 1, "ActiveSupport::HashWithIndifferentAccess" => 2)
+```
+
 ### Parallel testing
 
 If you are using a parallel testing gem such as [parallel_tests](https://github.com/grosser/parallel_tests) or [flatware](https://github.com/briandunn/flatware), first save the type definitions in RBS files.

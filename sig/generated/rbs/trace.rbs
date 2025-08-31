@@ -29,6 +29,9 @@ module RBS
     # @rbs (out_dir: String) -> void
     def save_files: (out_dir: String) -> void
 
+    # @rbs (Hash[String, Integer]) -> Hash[String, Integer]
+    def add_generics_size!: (Hash[String, Integer]) -> Hash[String, Integer]
+
     private
 
     # @rbs () -> Array[String]

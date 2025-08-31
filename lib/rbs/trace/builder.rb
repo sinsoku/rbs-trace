@@ -9,12 +9,12 @@ module RBS
       UNBOUND_NAME_METHOD = Class.instance_method(:name)
       private_constant :UNBOUND_CLASS_METHOD, :UNBOUND_NAME_METHOD
 
-      GENERICS_SIZE = {
-        Array => 1,
-        Range => 1,
-        Hash => 2
+      DEFAULT_GENERICS_SIZE = {
+        "Array" => 1,
+        "Range" => 1,
+        "Hash" => 2
       }.freeze
-      private_constant :GENERICS_SIZE
+      private_constant :DEFAULT_GENERICS_SIZE
 
       # @rbs (bind: Binding, parameters: Array[__todo__], void: bool) -> Array[__todo__]
       def method_call(bind:, parameters:, void:)
@@ -35,6 +35,11 @@ module RBS
         method_type = method_type.update(type: new_type) # rubocop:disable Style/RedundantSelfAssignment
 
         AST::Members::MethodDefinition::Overload.new(method_type:, annotations: [])
+      end
+
+      # @rbs () -> Hash[String, Integer]
+      def generics_size
+        @generics_size ||= DEFAULT_GENERICS_SIZE.dup
       end
 
       private
@@ -115,7 +120,7 @@ module RBS
         elsif klass == Object || class_name.nil?
           type_untyped
         else
-          size = GENERICS_SIZE[klass].to_i
+          size = generics_size[klass.name].to_i
           args = Array.new(size) { type_untyped }
           Types::ClassInstance.new(name: TypeName.parse(class_name), args:, location: nil)
         end
