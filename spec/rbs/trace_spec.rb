@@ -614,39 +614,83 @@ RSpec.describe RBS::Trace do
       end
     end
 
-    it "supports generics with Array, Hash and Range" do
-      source = <<~RUBY
-        class A
-          def m(x, y, z)
+    context "when not specified additional generics size" do
+      it "supports generics with Array, Hash and Range" do
+        source = <<~RUBY
+          class A
+            def m(x, y, z)
+            end
           end
+        RUBY
+        load_source(source) do |mod|
+          trace.enable { mod::A.new.m([], {}, 0..10) }
+
+          expect(to_rbs(trace)).to eq(<<~RUBY)
+            class A
+              # @rbs (Array[untyped], Hash[untyped, untyped], Range[untyped]) -> nil
+              def m(x, y, z)
+              end
+            end
+          RUBY
+
+          expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+            class A
+              # @rbs (Array[untyped], Hash[untyped, untyped], Range[untyped]) -> nil
+              def m(x, y, z)
+              end
+            end
+          RUBY
+
+          expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+            class A
+              #: (Array[untyped], Hash[untyped, untyped], Range[untyped]) -> nil
+              def m(x, y, z)
+              end
+            end
+          RUBY
         end
-      RUBY
-      load_source(source) do |mod|
-        trace.enable { mod::A.new.m([], {}, 0..10) }
+      end
+    end
 
-        expect(to_rbs(trace)).to eq(<<~RUBY)
+    context "when specified additional generics size" do
+      it "supports generics with specified classes" do
+        source = <<~RUBY
           class A
-            # @rbs (Array[untyped], Hash[untyped, untyped], Range[untyped]) -> nil
-            def m(x, y, z)
+            def m(a, b, c, d)
             end
           end
         RUBY
-
-        expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
-          class A
-            # @rbs (Array[untyped], Hash[untyped, untyped], Range[untyped]) -> nil
-            def m(x, y, z)
-            end
+        load_source(source) do |mod|
+          trace.add_generics_size!("CSV::Table" => 1)
+          trace.enable do
+            require "csv"
+            mod::A.new.m([], {}, 0..10, CSV::Table.new([]))
           end
-        RUBY
 
-        expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
-          class A
-            #: (Array[untyped], Hash[untyped, untyped], Range[untyped]) -> nil
-            def m(x, y, z)
+          expect(to_rbs(trace)).to eq(<<~RUBY)
+            class A
+              # @rbs (Array[untyped], Hash[untyped, untyped], Range[untyped], CSV::Table[untyped]) -> nil
+              def m(a, b, c, d)
+              end
             end
-          end
-        RUBY
+          RUBY
+
+          expect(to_rbs(trace, :rbs_keyword)).to eq(<<~RUBY)
+            class A
+              # @rbs (Array[untyped], Hash[untyped, untyped], Range[untyped], CSV::Table[untyped]) -> nil
+              def m(a, b, c, d)
+              end
+            end
+          RUBY
+
+          expect(to_rbs(trace, :rbs_colon)).to eq(<<~RUBY)
+            class A
+              #: (Array[untyped], Hash[untyped, untyped], Range[untyped], CSV::Table[untyped]) -> nil
+              def m(a, b, c, d)
+              end
+            end
+          RUBY
+        end
       end
     end
 

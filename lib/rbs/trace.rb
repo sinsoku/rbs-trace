@@ -62,6 +62,11 @@ module RBS
       files.each_value { |file| file.save_rbs(out_dir) }
     end
 
+    # @rbs (Hash[String, Integer]) -> Hash[String, Integer]
+    def add_generics_size!(additional_generics_size)
+      builder.generics_size.merge!(additional_generics_size)
+    end
+
     private
 
     # @rbs () -> Array[String]
