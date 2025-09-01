@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.7.0] - 2025-09-01
+
+- feat: Add support for generics other than Array, Range, and Hash
+
 ## [0.6.0] - 2025-05-12
 
 - feat: Support inline comments using colon-prefixed RBS syntax
