@@ -13,7 +13,7 @@ module RBS
         "Array" => 1,
         "Range" => 1,
         "Hash" => 2
-      }.freeze
+      }.freeze #: Hash[String, Integer]
       private_constant :DEFAULT_GENERICS_SIZE
 
       # @rbs (bind: Binding, parameters: Array[__todo__], void: bool) -> Array[__todo__]
